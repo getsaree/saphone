@@ -90,6 +90,19 @@
     .qr-box { display: flex; justify-content: center; align-items: center; background: #f8fbff; border: 1px solid var(--line); border-radius: 16px; min-height: 220px; padding: 12px; margin-top: 8px; }
     canvas { max-width: 100%; display: block; border-radius: 14px; background: white; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06); }
     .payload-box { margin-top: 10px; background: #f7f9fc; border: 1px solid var(--line); border-radius: 12px; padding: 10px; white-space: pre-wrap; word-break: break-all; font-size: 0.78rem; line-height: 1.6; max-height: 220px; overflow: auto; }
+    .autocomplete { position: relative; }
+    .autocomplete-options { position: absolute; inset-inline: 0; top: calc(100% + 5px); z-index: 20; max-height: 240px; overflow-y: auto; background: white; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 12px 28px rgba(15,23,42,.16); padding: 5px; }
+    .autocomplete-options[hidden] { display: none; }
+    .autocomplete-option { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 48px; padding: 8px 10px; border-radius: 8px; background: white; color: var(--text); text-align: start; }
+    .autocomplete-option:hover, .autocomplete-option:focus { background: var(--panel-soft); outline: none; transform: none; }
+    .autocomplete-option small { display: block; color: var(--muted); font-size: .72rem; font-weight: 400; margin-top: 3px; }
+    .autocomplete-empty { padding: 12px; color: var(--muted); font-size: .8rem; }
+    .install-modal { z-index: 1100; }
+    .install-modal .modal-panel { border-top: 4px solid var(--success); }
+    .install-mark { display: grid; place-items: center; width: 54px; height: 54px; margin-bottom: 12px; border-radius: 14px; background: #e7f5ee; color: var(--success); font-size: 1.6rem; font-weight: 800; }
+    .install-copy { color: var(--muted); line-height: 1.8; margin: 8px 0 16px; }
+    .sale-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+    .item-grid .autocomplete-option { min-height: 46px; }
     @media (max-width: 420px) { .row2 { grid-template-columns: 1fr; } .item-grid { grid-template-columns: 1fr 1fr; } .item-grid > *:last-child { grid-column: 1 / -1; } .summary { grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
@@ -134,23 +147,33 @@
       <div class="grid row2">
         <div>
           <label for="customerName">اسم العميل</label>
-          <input id="customerName" list="customerList" placeholder="اكتب اسم العميل أو اختَر" />
-          <datalist id="customerList"></datalist>
+          <div class="autocomplete" id="customerPicker">
+            <input id="customerName" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="customerOptions" placeholder="ابحث بالاسم أو الهاتف" />
+            <div class="autocomplete-options" id="customerOptions" role="listbox" hidden></div>
+          </div>
         </div>
         <div>
           <label for="phone">رقم الهاتف</label>
           <input id="phone" type="tel" placeholder="اختياري" />
         </div>
       </div>
-      <datalist id="productList"></datalist>
-            <div style="margin-top: 12px;">
-              <label for="paymentMode">طريقة التحصيل</label>
-              <select id="paymentMode" class="payment-select">
-                <option value="credit">آجل</option>
-                <option value="cash">نقدي بالكامل</option>
-                <option value="partial">دفع جزئي</option>
-              </select>
-            </div>
+      <div class="sale-options">
+        <div>
+          <label for="saleType">نوع البيع</label>
+          <select id="saleType" class="payment-select">
+            <option value="retail">تجزئة</option>
+            <option value="wholesale">جملة</option>
+          </select>
+        </div>
+        <div>
+          <label for="paymentMode">طريقة التحصيل</label>
+          <select id="paymentMode" class="payment-select">
+            <option value="credit">آجل</option>
+            <option value="cash">نقدي بالكامل</option>
+            <option value="partial">دفع جزئي</option>
+          </select>
+        </div>
+      </div>
       <div style="margin-top: 14px;">
         <div class="section-title" style="margin-bottom: 8px;">
           <span>أصناف الفاتورة</span>
@@ -166,7 +189,7 @@
       <div class="grid row2" style="margin-top: 12px;">
         <div>
           <label for="paidCash">المبلغ المدفوع نقداً</label>
-          <input id="paidCash" type="number" min="0" step="0.01" value="0" />
+          <input id="paidCash" type="text" inputmode="decimal" autocomplete="off" value="0" />
           <small class="muted" id="paymentHint">تُسجل الفاتورة على الحساب.</small>
         </div>
         <div>
@@ -264,6 +287,18 @@
     </div>
   </div>
 
+  <div id="installModal" class="modal install-modal" role="dialog" aria-modal="true" aria-labelledby="installTitle" aria-hidden="true">
+    <div class="modal-panel">
+      <div class="install-mark" aria-hidden="true">↓</div>
+      <div class="section-title"><span id="installTitle">ثبّت تطبيق مندوبي المبيعات</span></div>
+      <p class="install-copy" id="installMessage">أضف التطبيق إلى شاشة هاتفك للوصول إليه بسرعة والعمل دون اتصال.</p>
+      <div class="button-row">
+        <button type="button" class="primary" id="installAppBtn">تحميل التطبيق</button>
+        <button type="button" class="secondary" id="dismissInstallBtn">لاحقاً</button>
+      </div>
+    </div>
+  </div>
+
   <!-- مكتبة QR مدمجة ونظيفة لتعمل أوفلاين دون مشاكل -->
     <!-- مولد QR السابق غير مكتمل ومحفوظ داخل template دون تنفيذ. -->
   <template><script>
@@ -301,7 +336,8 @@
       const paymentModeInput = document.getElementById('paymentMode');
     const itemsContainer = document.getElementById('itemsContainer');
     const invoiceList = document.getElementById('invoiceList');
-    const customerList = document.getElementById('customerList');
+    const customerOptions = document.getElementById('customerOptions');
+    const saleTypeInput = document.getElementById('saleType');
     const reportDaySelect = document.getElementById('reportDaySelect');
     const qrCanvas = document.getElementById('qrCanvas');
     const payloadBox = document.getElementById('payloadBox');
@@ -316,7 +352,8 @@
       return `${year}-${month}-${day}`;
     }
 
-    function formatMoney(value) { return Number(value || 0).toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    const moneyFormatter = new Intl.NumberFormat('ar-EG', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    function formatMoney(value) { return moneyFormatter.format(Number(value || 0)); }
         function loadStoreSettings() {
           try { return JSON.parse(localStorage.getItem(STORE_SETTINGS_KEY) || '{}'); }
           catch { return {}; }
@@ -360,8 +397,54 @@
     function loadProducts() { try { const raw = localStorage.getItem(PRODUCTS_KEY); return raw ? JSON.parse(raw) : []; } catch { return []; } }
     function saveCustomers() { localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(state.customers)); renderCustomerSuggestions(); }
     function saveProducts() { localStorage.setItem(PRODUCTS_KEY, JSON.stringify(state.products)); renderProductSuggestions(); }
-    function renderCustomerSuggestions() { const names = [...new Set(state.customers.map(c => c.name).filter(Boolean))]; customerList.innerHTML = names.map(name => `<option value="${escapeHtml(name)}"></option>`).join(''); }
-    function renderProductSuggestions() { const names = [...new Set(state.products.map(p => p.name).filter(Boolean))]; const productListNode = document.getElementById('productList'); productListNode.innerHTML = names.map(name => `<option value="${escapeHtml(name)}"></option>`).join(''); }
+    function renderCustomerSuggestions() { if (document.activeElement === customerNameInput) renderPickerOptions(customerNameInput, customerOptions, customerRecords(), customerLabel, selectCustomer); }
+    function renderProductSuggestions() { itemsContainer.querySelectorAll('.item-name').forEach(input => { const panel = input.parentElement.querySelector('.autocomplete-options'); if (panel && document.activeElement === input) renderPickerOptions(input, panel, state.products, productLabel, product => selectProduct(input, product)); }); }
+
+    function customerRecords() { return [...new Map(state.customers.filter(customer => customer.name).map(customer => [customer.name.trim().toLowerCase(), customer])).values()]; }
+    function customerLabel(customer) { return { title: customer.name, detail: customer.phone || 'عميل مسجل' }; }
+    function productLabel(product) { return { title: product.name, detail: `${product.barcode ? `باركود: ${product.barcode} · ` : ''}تجزئة ${formatMoney(product.price || product.unitPrice || 0)} · جملة ${formatMoney(product.wholesalePrice || product.price || product.unitPrice || 0)}` }; }
+    function renderPickerOptions(input, panel, records, describe, onSelect) {
+      const query = input.value.trim().toLocaleLowerCase('ar');
+      const matches = records.filter(record => {
+        const item = describe(record);
+        return !query || `${item.title} ${item.detail}`.toLocaleLowerCase('ar').includes(query);
+      }).slice(0, 8);
+      panel.replaceChildren();
+      if (!matches.length) {
+        if (query) { const empty = document.createElement('div'); empty.className = 'autocomplete-empty'; empty.textContent = 'لا توجد نتائج مطابقة'; panel.appendChild(empty); }
+      } else {
+        matches.forEach(record => {
+          const item = describe(record);
+          const option = document.createElement('button');
+          option.type = 'button'; option.className = 'autocomplete-option'; option.setAttribute('role', 'option');
+          const text = document.createElement('span'); text.textContent = item.title;
+          const detail = document.createElement('small'); detail.textContent = item.detail;
+          const content = document.createElement('span'); content.append(text, detail); option.appendChild(content);
+          option.addEventListener('pointerdown', event => event.preventDefault());
+          option.addEventListener('click', () => { onSelect(record); panel.hidden = true; input.setAttribute('aria-expanded', 'false'); });
+          panel.appendChild(option);
+        });
+      }
+      panel.hidden = false; input.setAttribute('aria-expanded', 'true');
+    }
+
+    function attachPicker(input, panel, records, describe, onSelect) {
+      input.addEventListener('focus', () => renderPickerOptions(input, panel, records(), describe, onSelect));
+      input.addEventListener('input', () => renderPickerOptions(input, panel, records(), describe, onSelect));
+      input.addEventListener('keydown', event => {
+        if (event.key === 'Escape') { panel.hidden = true; input.setAttribute('aria-expanded', 'false'); }
+        if (event.key === 'ArrowDown' && !panel.hidden) { event.preventDefault(); panel.querySelector('.autocomplete-option')?.focus(); }
+      });
+      document.addEventListener('pointerdown', event => { if (!input.parentElement.contains(event.target)) { panel.hidden = true; input.setAttribute('aria-expanded', 'false'); } });
+    }
+
+    function selectCustomer(customer) { customerNameInput.value = customer.name; phoneInput.value = customer.phone || ''; }
+    function selectedProductPrice(product) {
+      const retailPrice = safeNumber(product.price ?? product.unitPrice, 0);
+      const wholesalePrice = safeNumber(product.wholesalePrice, 0);
+      return saleTypeInput.value === 'wholesale' && wholesalePrice > 0 ? wholesalePrice : retailPrice;
+    }
+    function selectProduct(input, product) { input.value = product.name; input.closest('.item-row').querySelector('.item-price').value = selectedProductPrice(product); input.dispatchEvent(new Event('change', { bubbles: true })); }
 
     function renderDayOptions() {
       const dayIds = new Set(state.days.map(day => day.id));
@@ -385,7 +468,7 @@
       const product = findProductByName(nameInput.value);
       if (!product) return;
       nameInput.value = product.name;
-      if (safeNumber(priceInput.value, 0) === 0 || safeNumber(priceInput.value, 0) <= 0.01) { priceInput.value = Number(product.price || product.unitPrice || 0).toFixed(2); }
+      if (safeNumber(priceInput.value, 0) === 0 || safeNumber(priceInput.value, 0) <= 0.01) { priceInput.value = selectedProductPrice(product); }
     }
 
     function createItemRow(item = { name: '', qty: 1, unitPrice: 0 }) {
@@ -397,7 +480,7 @@
           <button class="remove-item" type="button">حذف</button>
         </div>
         <div class="item-grid">
-          <div><label>اسم الصنف</label><input class="item-name" list="productList" type="text" value="${escapeHtml(item.name)}" placeholder="اسم المنتج" /></div>
+          <div><label>اسم الصنف</label><div class="autocomplete"><input class="item-name" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" placeholder="ابحث عن منتج" value="${escapeHtml(item.name)}" /><div class="autocomplete-options" role="listbox" hidden></div></div></div>
           <div><label>الكمية</label><input class="item-qty" type="number" min="1" step="1" value="${safeNumber(item.qty, 1)}" /></div>
           <div><label>سعر الوحدة</label><input class="item-price" type="number" min="0" step="0.01" value="${safeNumber(item.unitPrice, 0)}" /></div>
           <div><label>الإجمالي</label><input class="item-total" type="text" value="${formatMoney((safeNumber(item.qty, 1) * safeNumber(item.unitPrice, 0)))}" readonly /></div>
@@ -409,6 +492,7 @@
       const totalInput = row.querySelector('.item-total');
       const nameInput = row.querySelector('.item-name');
       const removeBtn = row.querySelector('.remove-item');
+      const optionsPanel = row.querySelector('.autocomplete-options');
 
       const recalc = () => {
         const qty = safeNumber(qtyInput.value, 0);
@@ -423,6 +507,7 @@
       nameInput.addEventListener('change', () => { applyProductPriceIfMatched(nameInput, priceInput); recalc(); });
       nameInput.addEventListener('blur', () => { applyProductPriceIfMatched(nameInput, priceInput); recalc(); });
       nameInput.addEventListener('input', recalc);
+      attachPicker(nameInput, optionsPanel, () => state.products, productLabel, product => selectProduct(nameInput, product));
       removeBtn.addEventListener('click', () => { row.remove(); recalcTotals(); });
       recalc(); return row;
     }
@@ -444,9 +529,10 @@
       const items = readItems();
       const subtotal = items.reduce((sum, item) => sum + item.total, 0);
       const mode = paymentModeInput.value;
-      const paidCash = mode === 'cash' ? subtotal : mode === 'credit' ? 0 : Math.min(subtotal, Math.max(0, safeNumber(paidCashInput.value, 0)));
+      const enteredPaid = Math.max(0, safeNumber(paidCashInput.value.replace(/[,٬\s]/g, ''), 0));
+      const paidCash = mode === 'cash' ? subtotal : mode === 'credit' ? 0 : Math.min(subtotal, enteredPaid);
       paidCashInput.disabled = mode !== 'partial';
-      paidCashInput.value = paidCash.toFixed(2);
+      if (mode !== 'partial') paidCashInput.value = paidCash.toFixed(2);
       document.getElementById('paymentHint').textContent = mode === 'cash' ? 'سيتم تسجيل كامل الفاتورة نقداً.' : mode === 'credit' ? 'تُسجل الفاتورة على الحساب.' : 'أدخل قيمة الدفعة، والباقي يسجل آجل.';
       const balance = subtotal - paidCash;
       document.getElementById('subTotalText').textContent = formatMoney(subtotal);
@@ -477,7 +563,7 @@
           box.innerHTML = `
             <div class="invoice-head">
               <strong>${escapeHtml(invoice.customerName || 'عميل جديد')}</strong>
-              <span class="badge">${invoice.balance > 0 ? 'آجل' : 'نقد'}</span>
+              <span class="badge">${invoice.saleType === 'wholesale' ? 'جملة' : 'تجزئة'} · ${invoice.balance > 0 ? 'آجل' : 'نقد'}</span>
             </div>
             <div class="invoice-meta">
               <span>${escapeHtml(invoice.customerPhone || 'بدون هاتف')}</span>
@@ -518,6 +604,7 @@
       if (!inv) return;
       customerNameInput.value = inv.customerName || ''; phoneInput.value = inv.customerPhone || '';
       notesInput.value = inv.notes || ''; paidCashInput.value = inv.paidCash || 0;
+      saleTypeInput.value = inv.saleType || 'retail';
       paymentModeInput.value = inv.balance <= 0 ? 'cash' : inv.paidCash > 0 ? 'partial' : 'credit';
       itemsContainer.innerHTML = ''; (inv.items || []).forEach(item => addItemRow(item));
       state.selectedInvoiceId = id; recalcTotals(); window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -526,7 +613,8 @@
     function prepareInvoiceFromForm() {
       const items = readItems();
       const subtotal = items.reduce((sum, item) => sum + (safeNumber(item.qty, 0) * safeNumber(item.unitPrice, 0)), 0);
-      const paidCash = Math.min(subtotal, Math.max(0, safeNumber(paidCashInput.value, 0)));
+      const enteredPayment = Math.max(0, safeNumber(paidCashInput.value.replace(/[,٬\s]/g, ''), 0));
+      const paidCash = paymentModeInput.value === 'cash' ? subtotal : paymentModeInput.value === 'credit' ? 0 : Math.min(subtotal, enteredPayment);
       const customerName = customerNameInput.value.trim();
       const customerPhone = phoneInput.value.trim();
       const notes = notesInput.value.trim();
@@ -536,7 +624,7 @@
 
       const existingInvoice = state.invoices.find(item => item.id === state.selectedInvoiceId);
       const invoice = {
-        id: state.selectedInvoiceId || uid(), customerName, customerPhone, notes, items,
+        id: state.selectedInvoiceId || uid(), customerName, customerPhone, notes, items, saleType: saleTypeInput.value,
         total: subtotal, paidCash, balance: Math.max(0, subtotal - paidCash),
         createdAt: existingInvoice?.createdAt || Date.now(),
         date: existingInvoice?.date || new Date().toISOString(),
@@ -573,7 +661,7 @@
         version: 1, app: 'van-sales-mobile', deviceId: 'sales-phone-' + Math.random().toString(16).slice(2, 8),
         generatedAt: new Date().toISOString(), merchant: 'Main Store',
         invoices: todayInvoices.map(inv => ({
-          id: inv.id, customerName: inv.customerName, customerPhone: inv.customerPhone || '', notes: inv.notes || '',
+          id: inv.id, customerName: inv.customerName, customerPhone: inv.customerPhone || '', notes: inv.notes || '', saleType: inv.saleType || 'retail',
           items: inv.items, total: Number(inv.total || 0), paidCash: Number(inv.paidCash || 0), balance: Number(inv.balance || 0),
           createdAt: inv.createdAt, date: inv.date || new Date(inv.createdAt).toISOString(), dayId: inv.dayId || state.activeDayId
         }))
@@ -668,7 +756,7 @@
       const invoice = state.invoices.find(item => item.id === id);
       if (!invoice) return;
       const rows = (invoice.items || []).map(item => `<tr><td>${escapeHtml(item.name)}</td><td>${safeNumber(item.qty)}</td><td>${formatMoney(item.unitPrice)}</td><td>${formatMoney(item.total)}</td></tr>`).join('');
-      const content = `<div class="title">فاتورة مبيعات</div><div class="meta"><span>رقم الفاتورة: ${escapeHtml(invoice.id)}</span><span>التاريخ: ${new Date(invoice.createdAt).toLocaleString('ar-EG')}</span></div><div class="meta"><span>العميل: ${escapeHtml(invoice.customerName)}</span><span>الهاتف: ${escapeHtml(invoice.customerPhone || 'غير مسجل')}</span></div><table><thead><tr><th>الصنف</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr></thead><tbody>${rows}</tbody></table><table class="totals"><tbody><tr><td>الإجمالي</td><td>${formatMoney(invoice.total)}</td></tr><tr><td>المدفوع</td><td>${formatMoney(invoice.paidCash)}</td></tr><tr><td>المتبقي</td><td>${formatMoney(invoice.balance)}</td></tr></tbody></table>${invoice.notes ? `<p>ملاحظات: ${escapeHtml(invoice.notes)}</p>` : ''}`;
+      const content = `<div class="title">فاتورة مبيعات - ${invoice.saleType === 'wholesale' ? 'جملة' : 'تجزئة'}</div><div class="meta"><span>رقم الفاتورة: ${escapeHtml(invoice.id)}</span><span>التاريخ: ${new Date(invoice.createdAt).toLocaleString('ar-EG')}</span></div><div class="meta"><span>العميل: ${escapeHtml(invoice.customerName)}</span><span>الهاتف: ${escapeHtml(invoice.customerPhone || 'غير مسجل')}</span></div><table><thead><tr><th>الصنف</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr></thead><tbody>${rows}</tbody></table><table class="totals"><tbody><tr><td>الإجمالي</td><td>${formatMoney(invoice.total)}</td></tr><tr><td>المدفوع</td><td>${formatMoney(invoice.paidCash)}</td></tr><tr><td>المتبقي</td><td>${formatMoney(invoice.balance)}</td></tr></tbody></table>${invoice.notes ? `<p>ملاحظات: ${escapeHtml(invoice.notes)}</p>` : ''}`;
       openPrintDocument(`فاتورة ${invoice.id}`, content);
     }
 
@@ -676,11 +764,11 @@
       const dayId = state.reportDayId || state.activeDayId;
       const invoices = state.invoices.filter(invoice => invoice.dayId === dayId);
       if (!invoices.length) { alert('لا توجد فواتير في اليومية المختارة.'); return; }
-      const rows = invoices.map(invoice => `<tr><td>${escapeHtml(invoice.customerName)}</td><td>${new Date(invoice.createdAt).toLocaleString('ar-EG')}</td><td>${invoice.balance > 0 ? 'آجل' : 'نقد'}</td><td>${formatMoney(invoice.total)}</td><td>${formatMoney(invoice.paidCash)}</td><td>${formatMoney(invoice.balance)}</td></tr>`).join('');
+      const rows = invoices.map(invoice => `<tr><td>${escapeHtml(invoice.customerName)}</td><td>${invoice.saleType === 'wholesale' ? 'جملة' : 'تجزئة'}</td><td>${new Date(invoice.createdAt).toLocaleString('ar-EG')}</td><td>${invoice.balance > 0 ? 'آجل' : 'نقد'}</td><td>${formatMoney(invoice.total)}</td><td>${formatMoney(invoice.paidCash)}</td><td>${formatMoney(invoice.balance)}</td></tr>`).join('');
       const total = invoices.reduce((sum, invoice) => sum + safeNumber(invoice.total), 0);
       const cash = invoices.reduce((sum, invoice) => sum + safeNumber(invoice.paidCash), 0);
       const credit = invoices.reduce((sum, invoice) => sum + safeNumber(invoice.balance), 0);
-      const content = `<div class="title">تقرير اليومية ${escapeHtml(dayId)}</div><div class="meta"><span>عدد الفواتير: ${invoices.length}</span><span>إجمالي المبيعات: ${formatMoney(total)}</span><span>النقدية: ${formatMoney(cash)}</span><span>الآجل: ${formatMoney(credit)}</span></div><table><thead><tr><th>العميل</th><th>التاريخ</th><th>التحصيل</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th></tr></thead><tbody>${rows}</tbody></table>`;
+      const content = `<div class="title">تقرير اليومية ${escapeHtml(dayId)}</div><div class="meta"><span>عدد الفواتير: ${invoices.length}</span><span>إجمالي المبيعات: ${formatMoney(total)}</span><span>النقدية: ${formatMoney(cash)}</span><span>الآجل: ${formatMoney(credit)}</span></div><table><thead><tr><th>العميل</th><th>نوع البيع</th><th>التاريخ</th><th>التحصيل</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th></tr></thead><tbody>${rows}</tbody></table>`;
       openPrintDocument(`تقرير ${dayId}`, content);
     }
 
@@ -693,6 +781,7 @@
         name: String(item.name || item.Name || item.ProductName || '').trim(),
         price: safeNumber(item.price ?? item.Price ?? item.UnitPrice ?? item.SellingPrice, 0),
         unitPrice: safeNumber(item.price ?? item.Price ?? item.UnitPrice ?? item.SellingPrice, 0),
+        wholesalePrice: safeNumber(item.wholesalePrice ?? item.WholesalePrice, 0),
         barcode: String(item.barcode || item.Barcode || ''),
         category: String(item.category || item.Category || 'عام')
       })).filter(item => item.name);
@@ -759,14 +848,45 @@
       document.getElementById('printDayBtn').addEventListener('click', printDayReport);
       document.querySelectorAll('.nav-tab').forEach(button => button.addEventListener('click', () => activatePage(button.dataset.page)));
     document.getElementById('newDayBtn').addEventListener('click', startNewDay);
+    attachPicker(customerNameInput, customerOptions, customerRecords, customerLabel, selectCustomer);
     reportDaySelect.addEventListener('change', () => { state.reportDayId = reportDaySelect.value; renderInvoiceList(); });
     paidCashInput.addEventListener('input', recalcTotals);
-      paymentModeInput.addEventListener('change', recalcTotals);
+    paymentModeInput.addEventListener('change', recalcTotals);
+    saleTypeInput.addEventListener('change', () => {
+      itemsContainer.querySelectorAll('.item-row').forEach(row => {
+        const product = findProductByName(row.querySelector('.item-name').value);
+        if (product) row.querySelector('.item-price').value = selectedProductPrice(product);
+      });
+      recalcTotals();
+    });
     qrModal.addEventListener('click', (event) => { if (event.target === qrModal) closeQrModal(); });
 
     resetForm(); ensureActiveDay(); renderCustomerSuggestions(); renderProductSuggestions(); renderSummary(); renderInvoiceList();
   renderStoreSettings();
   document.getElementById('footerYear').textContent = String(new Date().getFullYear());
+
+    const installModal = document.getElementById('installModal');
+    let installPromptEvent = null;
+    function isInstalledApp() { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }
+    function closeInstallModal() { installModal.classList.remove('open'); installModal.setAttribute('aria-hidden', 'true'); }
+    function showInstallModal() { if (!isInstalledApp()) { installModal.classList.add('open'); installModal.setAttribute('aria-hidden', 'false'); } }
+    window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); installPromptEvent = event; });
+    window.addEventListener('appinstalled', () => { installPromptEvent = null; closeInstallModal(); });
+    document.getElementById('installAppBtn').addEventListener('click', async () => {
+      if (installPromptEvent) {
+        installPromptEvent.prompt();
+        await installPromptEvent.userChoice;
+        installPromptEvent = null;
+        closeInstallModal();
+      } else {
+        document.getElementById('installMessage').textContent = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+          ? 'على iPhone أو iPad: اضغط مشاركة في Safari ثم اختر "إضافة إلى الشاشة الرئيسية".'
+          : 'من قائمة المتصفح اختر "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية". يجب فتح الصفحة عبر HTTPS لتفعيل التثبيت.';
+        document.getElementById('installAppBtn').hidden = true;
+      }
+    });
+    document.getElementById('dismissInstallBtn').addEventListener('click', closeInstallModal);
+    if (!isInstalledApp()) window.addEventListener('load', () => window.setTimeout(showInstallModal, 350), { once: true });
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
