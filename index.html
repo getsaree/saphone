@@ -13,373 +13,84 @@
   <title>مندوبي المبيعات - Van Sales</title>
   <style>
     :root {
-      --bg: #f4f7fb;
-      --panel: #ffffff;
-      --panel-soft: #e8eff7;
-      --primary: #174a7e;
-      --primary-dark: #0b2545;
-      --accent: #f59e0b;
-      --danger: #dc2626;
-      --success: #16a34a;
-      --text: #122033;
-      --muted: #5c6d83;
-      --line: #dfe7f1;
-      --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-      --radius: 18px;
+      --bg: #f4f7fb; --panel: #ffffff; --panel-soft: #e8eff7; --primary: #174a7e;
+      --primary-dark: #0b2545; --accent: #f59e0b; --danger: #dc2626; --success: #16a34a;
+      --text: #122033; --muted: #5c6d83; --line: #dfe7f1; --shadow: 0 10px 25px rgba(15, 23, 42, 0.08); --radius: 18px;
     }
-
     * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      font-family: "Tahoma", "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100%;
-      scroll-behavior: smooth;
-    }
-
+    html, body { margin: 0; font-family: "Tahoma", "Segoe UI", sans-serif; background: var(--bg); color: var(--text); min-height: 100%; scroll-behavior: smooth; }
     body { padding: 12px; }
-
-    .app {
-      max-width: 540px;
-      margin: 0 auto;
-    }
-
-    .topbar {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      border-radius: 20px;
-      padding: 18px 18px 14px;
-      box-shadow: var(--shadow);
-      margin-bottom: 14px;
-    }
-
-    .topbar h1 {
-      margin: 0;
-      font-size: 1.3rem;
-    }
-
+    body { padding: 12px 12px calc(92px + env(safe-area-inset-bottom)); }
+      .metric-value { font-size: clamp(1.1rem, 4vw, 1.7rem); font-weight: 700; }
+      .secondary { background: var(--panel-soft); color: var(--primary-dark); border: 1px solid rgba(23, 74, 126, 0.16); flex: 1; min-width: 140px; }
+      .badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; padding: 4px 8px; font-size: 0.7rem; font-weight: 700; background: rgba(23, 74, 126, 0.1); color: var(--primary-dark); }
+    .app { max-width: 640px; margin: 0 auto; }
+    .topbar { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border-radius: 20px; padding: 18px 18px 14px; box-shadow: var(--shadow); margin-bottom: 14px; }
+    .topbar h1 { margin: 0; font-size: 1.3rem; }
     .brand-row { display: flex; align-items: center; gap: 14px; }
-
-    .brand-logo {
-      width: 56px;
-      height: 56px;
-      object-fit: contain;
-      background: white;
-      border-radius: 12px;
-      padding: 4px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      flex-shrink: 0;
-    }
-
-    .topbar small {
-      opacity: 0.9;
-      display: inline-block;
-      margin-top: 6px;
-    }
-
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 14px;
-    }
-
+    .brand-logo { width: 56px; height: 56px; object-fit: contain; background: white; border-radius: 12px; padding: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); flex-shrink: 0; }
+    .topbar small { opacity: 0.9; display: inline-block; margin-top: 6px; }
+    .store-caption { display: block; margin-top: 5px; font-size: .76rem; opacity: .78; }
+    .tab-page { display: none; }
+    .tab-page.active { display: block; animation: page-in .18s ease-out; }
+    @keyframes page-in { from { opacity: .65; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; }
     .summary .card { background: linear-gradient(180deg, #fff, #f8fbff); }
-
-    .metric {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .metric-value {
-      font-size: clamp(1.1rem, 4vw, 1.7rem);
-      font-weight: 700;
-      letter-spacing: .3px;
-    }
-
-    .section {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      font-weight: 700;
-      font-size: 1rem;
-    }
-
-    .grid { display: grid; gap: 10px; }
-    .row2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-
-    label {
-      display: block;
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 6px;
-      font-weight: 600;
-    }
-
+    .metric { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+    .metric-value { font-size: clamp(1.1rem, 4vw, 1.7rem); font-weight: 700; letter-spacing: .3px; }
+    .section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 14px; }
+    .section-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; font-weight: 700; font-size: 1rem; }
+    .grid { display: grid; gap: 10px; } .row2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
     input, textarea, select, button { font: inherit; }
-
-    input, textarea, select {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: #fdfdff;
-      border-radius: 12px;
-      padding: 12px 14px;
-      color: var(--text);
-      transition: .2s ease;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
-    }
-
+    input, textarea, select { width: 100%; border: 1px solid var(--line); background: #fdfdff; border-radius: 12px; padding: 12px 14px; color: var(--text); transition: .2s ease; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(23, 74, 126, 0.14); }
     textarea { min-height: 72px; resize: vertical; }
-
     .items { display: grid; gap: 12px; margin-top: 8px; }
-
-    .item-row {
-      background: #f9fbff;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
-    }
-
-    .item-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
+    .item-row { background: #f9fbff; border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+    .item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .item-head strong { font-size: .9rem; }
-
-    .remove-item {
-      background: rgba(220, 38, 38, 0.08);
-      color: var(--danger);
-      border: 1px solid rgba(220, 38, 38, 0.2);
-      border-radius: 10px;
-      padding: 6px 10px;
-      font-size: .78rem;
-      cursor: pointer;
-    }
-
-    .item-grid {
-      display: grid;
-      grid-template-columns: 1.3fr 0.7fr 1fr 1fr;
-      gap: 8px;
-    }
-
-    .muted { color: var(--muted); }
-
-    .totals {
-      background: #f5faf7;
-      border: 1px solid #d7f2e5;
-      border-radius: 14px;
-      padding: 12px;
-      margin-top: 12px;
-    }
-
-    .totals-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 8px 0;
-      border-bottom: 1px solid #d7f2e5;
-      font-size: 0.95rem;
-    }
-
+    .remove-item { background: rgba(220, 38, 38, 0.08); color: var(--danger); border: 1px solid rgba(220, 38, 38, 0.2); border-radius: 10px; padding: 6px 10px; font-size: .78rem; cursor: pointer; }
+    .item-grid { display: grid; grid-template-columns: 1.3fr 0.7fr 1fr 1fr; gap: 8px; }
+    .totals { background: #f5faf7; border: 1px solid #d7f2e5; border-radius: 14px; padding: 12px; margin-top: 12px; }
+    .totals-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid #d7f2e5; font-size: 0.95rem; }
     .totals-row:last-child { border-bottom: none; }
     .totals-row strong { font-size: 1rem; }
-
-    .button-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      border: none;
-      cursor: pointer;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-weight: 700;
-      transition: transform .15s ease, opacity .2s ease;
-    }
-
+    .button-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+    button { border: none; cursor: pointer; border-radius: 12px; padding: 12px 16px; min-height: 46px; font-weight: 700; transition: transform .15s ease, opacity .2s ease; touch-action: manipulation; }
     button:hover { transform: translateY(-1px); }
-    button:active { transform: translateY(0); }
-
-    .primary {
-      background: var(--primary);
-      color: white;
-      flex: 1;
-      min-width: 140px;
-    }
-
-    .secondary {
-      background: var(--panel-soft);
-      color: var(--primary-dark);
-      border: 1px solid rgba(15, 118, 110, 0.15);
-      flex: 1;
-      min-width: 140px;
-    }
-
-    .warn {
-      background: rgba(245, 158, 11, 0.12);
-      color: #9a6300;
-      border: 1px solid rgba(245, 158, 11, 0.2);
-      flex: 1;
-      min-width: 140px;
-    }
-
-    .danger {
-      background: rgba(220, 38, 38, 0.08);
-      color: var(--danger);
-      border: 1px solid rgba(220, 38, 38, 0.14);
-    }
-
+    .primary { background: var(--primary); color: white; flex: 1; min-width: 140px; }
+    .secondary { background: var(--panel-soft); color: var(--primary-dark); border: 1px solid rgba(15, 118, 110, 0.15); flex: 1; min-width: 140px; }
+    .warn { background: rgba(245, 158, 11, 0.12); color: #9a6300; border: 1px solid rgba(245, 158, 11, 0.2); flex: 1; min-width: 140px; }
+    .danger { background: rgba(220, 38, 38, 0.08); color: var(--danger); border: 1px solid rgba(220, 38, 38, 0.14); }
     .invoice-list { display: grid; gap: 10px; }
-
-    .invoice-item {
-      background: #f9fbff;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
-    }
-
-    .invoice-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .invoice-meta {
-      font-size: 0.78rem;
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-
+    .invoice-item { background: #f9fbff; border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+    .invoice-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 8px; }
+    .invoice-meta { font-size: 0.78rem; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
     .invoice-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-    .small-btn {
-      border-radius: 10px;
-      padding: 8px 10px;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      padding: 4px 8px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      background: rgba(15, 118, 110, 0.1);
-      color: var(--primary-dark);
-    }
-
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      padding: 16px 8px;
-      border: 1px dashed var(--line);
-      border-radius: 12px;
-      background: #fafcff;
-    }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.45);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      z-index: 999;
-    }
-
+    .small-btn { border-radius: 10px; padding: 8px 10px; font-size: 0.75rem; font-weight: 700; }
+    .badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; padding: 4px 8px; font-size: 0.7rem; font-weight: 700; background: rgba(15, 118, 110, 0.1); color: var(--primary-dark); }
+    .empty { text-align: center; color: var(--muted); padding: 16px 8px; border: 1px dashed var(--line); border-radius: 12px; background: #fafcff; }
+    .bottom-nav { position: fixed; inset-inline: 0; bottom: 0; z-index: 900; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.96); border-top: 1px solid var(--line); box-shadow: 0 -6px 20px rgba(11,37,69,.08); backdrop-filter: blur(14px); }
+    .nav-tab { display: grid; justify-items: center; align-content: center; gap: 3px; min-height: 56px; padding: 5px 8px; color: var(--muted); background: transparent; border-radius: 14px; font-size: .72rem; }
+    .nav-tab svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-tab.active { color: var(--primary-dark); background: var(--panel-soft); }
+    .settings-form { display: grid; gap: 12px; }
+    .about-block { padding: 14px 0 0; border-top: 1px solid var(--line); margin-top: 16px; }
+    .app-footer { text-align: center; line-height: 1.9; padding: 12px 4px 4px; font-size: .76rem; color: var(--muted); }
+    .app-footer a, .about-block a { color: var(--primary); font-weight: 700; }
+    .payment-select { font-weight: 700; border-color: #b8cbe0; background: #f8fbff; }
+    .invoice-actions .small-btn { min-height: 40px; }
+    .print-only { display: none; }
+    @media print { body > * { display: none !important; } .print-only { display: block !important; } }
+    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 999; }
     .modal.open { display: flex; }
-
-    .modal-panel {
-      width: min(100%, 420px);
-      background: white;
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      padding: 18px;
-    }
-
-    .qr-box {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #f8fbff;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      min-height: 220px;
-      padding: 12px;
-      margin-top: 8px;
-    }
-
-    canvas {
-      max-width: 100%;
-      display: block;
-      border-radius: 14px;
-      background: white;
-      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
-    }
-
-    .payload-box {
-      margin-top: 10px;
-      background: #f7f9fc;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px;
-      white-space: pre-wrap;
-      word-break: break-all;
-      font-size: 0.78rem;
-      line-height: 1.6;
-      max-height: 220px;
-      overflow: auto;
-    }
-
-    @media (max-width: 420px) {
-      .row2 { grid-template-columns: 1fr; }
-      .item-grid { grid-template-columns: 1fr 1fr; }
-      .item-grid > *:last-child { grid-column: 1 / -1; }
-      .summary { grid-template-columns: 1fr 1fr; }
-    }
+    .modal-panel { width: min(100%, 420px); background: white; border-radius: 18px; box-shadow: var(--shadow); padding: 18px; }
+    .qr-box { display: flex; justify-content: center; align-items: center; background: #f8fbff; border: 1px solid var(--line); border-radius: 16px; min-height: 220px; padding: 12px; margin-top: 8px; }
+    canvas { max-width: 100%; display: block; border-radius: 14px; background: white; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06); }
+    .payload-box { margin-top: 10px; background: #f7f9fc; border: 1px solid var(--line); border-radius: 12px; padding: 10px; white-space: pre-wrap; word-break: break-all; font-size: 0.78rem; line-height: 1.6; max-height: 220px; overflow: auto; }
+    @media (max-width: 420px) { .row2 { grid-template-columns: 1fr; } .item-grid { grid-template-columns: 1fr 1fr; } .item-grid > *:last-child { grid-column: 1 / -1; } .summary { grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
 <body>
@@ -390,9 +101,11 @@
         <div>
           <h1>مندوبي المبيعات</h1>
           <small>تتبع المبيعات دون إنترنت</small>
+          <span id="storeNameCaption" class="store-caption"></span>
         </div>
       </div>
     </header>
+  <main id="salesPage" class="tab-page active">
 
     <section class="summary">
       <div class="card">
@@ -418,7 +131,6 @@
         <span>إدخال فاتورة سريعة</span>
         <span class="badge" id="invoiceState">مسودة</span>
       </div>
-
       <div class="grid row2">
         <div>
           <label for="customerName">اسم العميل</label>
@@ -430,9 +142,15 @@
           <input id="phone" type="tel" placeholder="اختياري" />
         </div>
       </div>
-
       <datalist id="productList"></datalist>
-
+            <div style="margin-top: 12px;">
+              <label for="paymentMode">طريقة التحصيل</label>
+              <select id="paymentMode" class="payment-select">
+                <option value="credit">آجل</option>
+                <option value="cash">نقدي بالكامل</option>
+                <option value="partial">دفع جزئي</option>
+              </select>
+            </div>
       <div style="margin-top: 14px;">
         <div class="section-title" style="margin-bottom: 8px;">
           <span>أصناف الفاتورة</span>
@@ -440,24 +158,22 @@
         </div>
         <div id="itemsContainer" class="items"></div>
       </div>
-
       <div class="totals">
         <div class="totals-row"><span>إجمالي الفاتورة</span><strong id="subTotalText">0.00</strong></div>
         <div class="totals-row"><span>المبلغ المدفوع</span><strong id="paidText">0.00</strong></div>
         <div class="totals-row"><span>المتبقي / الدين</span><strong id="balanceText">0.00</strong></div>
       </div>
-
       <div class="grid row2" style="margin-top: 12px;">
         <div>
-          <label for="paidCash">مدفوع نقداً</label>
+          <label for="paidCash">المبلغ المدفوع نقداً</label>
           <input id="paidCash" type="number" min="0" step="0.01" value="0" />
+          <small class="muted" id="paymentHint">تُسجل الفاتورة على الحساب.</small>
         </div>
         <div>
           <label for="notes">ملاحظات</label>
           <textarea id="notes" placeholder="ملاحظات اختيارية..."></textarea>
         </div>
       </div>
-
       <div class="button-row">
         <button type="button" class="primary" id="saveInvoiceBtn">حفظ الفاتورة محلياً</button>
         <button type="button" class="warn" id="generateQrBtn">توليد كود الترحيل للسيستم</button>
@@ -465,8 +181,33 @@
     </section>
 
     <section class="section">
+    </main>
+    <section id="settingsPage" class="section tab-page">
       <div class="section-title">
         <span>الإعدادات</span>
+      </div>
+      <div class="settings-form">
+        <div>
+          <label for="storeNameInput">اسم المتجر</label>
+          <input id="storeNameInput" type="text" maxlength="80" placeholder="اسم المتجر" />
+        </div>
+        <div>
+          <label for="storeAddressInput">عنوان المتجر</label>
+          <input id="storeAddressInput" type="text" maxlength="160" placeholder="المدينة أو العنوان" />
+        </div>
+        <div>
+          <label for="storePhoneInput">رقم هاتف المتجر</label>
+          <input id="storePhoneInput" type="tel" maxlength="30" placeholder="رقم التواصل" />
+        </div>
+        <button type="button" class="primary" id="saveStoreSettingsBtn">حفظ بيانات المتجر</button>
+        <div id="settingsStatus" class="muted" role="status" aria-live="polite"></div>
+      </div>
+      <div class="about-block">
+        <strong>عن التطبيق</strong>
+        <p>مندوبي المبيعات من نظام سريع لنقاط البيع، يعمل دون اتصال ويحفظ فواتير المندوب على هذا الجهاز.</p>
+        <p>تصميم وتطوير: <strong>محمد عاطف</strong></p>
+        <p>الدعم الفني: <a href="tel:+201142493701">+201142493701</a></p>
+        <p>موقع البرنامج: <a href="https://getsaree.github.io/saree/" target="_blank" rel="noopener">getsaree.github.io/saree</a></p>
       </div>
       <div class="button-row">
         <button type="button" class="secondary" id="importBackupBtn">استيراد نسخة الديسكتوب</button>
@@ -478,14 +219,33 @@
     </section>
 
     <section class="section">
+    <section id="reportsPage" class="section tab-page">
       <div class="section-title">
         <span>التقارير اليومية</span>
         <select id="reportDaySelect" aria-label="اختر اليومية"></select>
+        <button type="button" class="secondary small-btn" id="printDayBtn" title="طباعة أو حفظ تقرير PDF">PDF التقرير</button>
       </div>
       <div id="selectedDaySummary" class="invoice-meta"></div>
       <div id="invoiceList" class="invoice-list"></div>
     </section>
+    <footer class="app-footer">
+      <span>© <span id="footerYear"></span> سريع POS · جميع الحقوق محفوظة</span><br />
+      <a href="https://getsaree.github.io/saree/" target="_blank" rel="noopener">موقع البرنامج</a>
+      <span> · الدعم </span><a href="tel:+201142493701">+201142493701</a>
+    </footer>
   </div>
+
+  <nav class="bottom-nav" aria-label="التنقل الرئيسي">
+    <button type="button" class="nav-tab active" data-page="salesPage" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5z"/><path d="M9 20v-6h6v6"/></svg><span>البيع</span>
+    </button>
+    <button type="button" class="nav-tab" data-page="reportsPage">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4m8-4v4M4 10h16m-11 4h2m3 0h2m-7 3h2"/></svg><span>اليوميات</span>
+    </button>
+    <button type="button" class="nav-tab" data-page="settingsPage">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.1.9-1.4 2.4-1.3-.5a7.8 7.8 0 0 1-1.5.9l-.2 1.4h-2.8l-.2-1.4a7.8 7.8 0 0 1-1.5-.9l-1.3.5L7 16l1.1-.9a7.7 7.7 0 0 1 0-1.8L7 12.4 8.4 10l1.3.5a7.8 7.8 0 0 1 1.5-.9l.2-1.4h2.8l.2 1.4a7.8 7.8 0 0 1 1.5.9l1.3-.5 1.4 2.4-1.1.9a7.7 7.7 0 0 1 0 1.7z"/></svg><span>الإعدادات</span>
+    </button>
+  </nav>
 
   <div id="qrModal" class="modal" aria-hidden="true">
     <div class="modal-panel">
@@ -504,7 +264,16 @@
     </div>
   </div>
 
-  <script src="qrcode-generator.min.js"></script>
+  <!-- مكتبة QR مدمجة ونظيفة لتعمل أوفلاين دون مشاكل -->
+    <!-- مولد QR السابق غير مكتمل ومحفوظ داخل template دون تنفيذ. -->
+  <template><script>
+    var qrcode=function(){var qrcode=function(typeNumber,errorCorrectLevel){var PAD0=0xEC,PAD1=0x11,_typeNumber=typeNumber,_errorCorrectLevel=QRErrorCorrectLevel[errorCorrectLevel],_modules=null,_moduleCount=0,_dataCache=null,_dataList=[];var _this={};_this.addData=function(data,mode){mode=mode||'Byte';var newData=null;switch(mode){case 'Numeric':newData=qrcodeNumber(data);break;case 'Alphanumeric':newData=qrcodeAlphaNum(data);break;case 'Byte':newData=qrcodeByte(data);break;case 'Kanji':newData=qrcodeKanji(data);break;default:throw 'mode:'+mode;}if(!_dataList.length){_dataList=[newData];}else{_dataList.push(newData);}};var _createData=function(typeNumber,errorCorrectLevel){var rsBlocks=QRRSBlock.getRSBlocks(typeNumber,errorCorrectLevel),buffer=new QRBitBuffer();for(var i=0;i<_dataList.length;i++){var data=_dataList[i];buffer.put(data.mode,4);buffer.put(data.getLength(),QRUtil.getLengthInBits(data.mode,typeNumber));data.write(buffer);}var totalDataCount=0;for(var i=0;i<rsBlocks.length;i++){totalDataCount+=rsBlocks[i].dataCount;}if(buffer.getLengthInBits()>totalDataCount*8){throw 'code length overflow. ('+buffer.getLengthInBits()+'>'+totalDataCount*8+')';}if(buffer.getLengthInBits()+4<=totalDataCount*8){buffer.put(0,4);}while(buffer.getLengthInBits()%8!=0){buffer.putBit(false);}while(true){if(buffer.getLengthInBits()>=totalDataCount*8){break;}buffer.put(PAD0,8);if(buffer.getLengthInBits()>=totalDataCount*8){break;}buffer.put(PAD1,8);}return _createBytes(buffer,rsBlocks);};var _createBytes=function(buffer,rsBlocks){var offset=0,maxDcCount=0,maxEcCount=0,dcdata=[],ecdata=[];for(var r=0;r<rsBlocks.length;r++){var dcCount=rsBlocks[r].dataCount,ecCount=rsBlocks[r].totalCount-dcCount;maxDcCount=Math.max(maxDcCount,dcCount);maxEcCount=Math.max(maxEcCount,ecCount);dcdata[r]=new Array(dcCount);for(var i=0;i<dcdata[r].length;i++){dcdata[r][i]=0xff&buffer.buffer[i+offset];}offset+=dcCount;var rsPoly=QRUtil.getErrorCorrectPolynomial(ecCount),rawPoly=new QRPolynomial(dcdata[r],rsPoly.getLength()-1),modPoly=rawPoly.mod(rsPoly);ecdata[r]=new Array(rsPoly.getLength()-1);for(var i=0;i<ecdata[r].length;i++){var modIndex=i+modPoly.getLength()-ecdata[r].length;ecdata[r][i]=modIndex>=0?modPoly.get(modIndex):0;}}var totalCodeCount=0;for(var i=0;i<rsBlocks.length;i++){totalCodeCount+=rsBlocks[i].totalCount;}var data=new Array(totalCodeCount),index=0;for(var i=0;i<maxDcCount;i++){for(var r=0;r<rsBlocks.length;r++){if(i<dcdata[r].length){data[index++]=dcdata[r][i];}}}for(var i=0;i<maxEcCount;i++){for(var r=0;r<rsBlocks.length;r++){if(i<ecdata[r].length){data[index++]=ecdata[r][i];}}}return data;};var _getModuleCount=function(){return _moduleCount;};var _makeImpl=function(test,maskPattern){_moduleCount=_typeNumber*4+17;_modules=function(moduleCount){var modules=new Array(moduleCount);for(var row=0;row<moduleCount;row++){modules[row]=new Array(moduleCount);for(var col=0;col<moduleCount;col++){modules[row][col]=null;}}return modules;}(_moduleCount);_setupPositionProbePattern(0,0);_setupPositionProbePattern(_moduleCount-7,0);_setupPositionProbePattern(0,_moduleCount-7);_setupPositionAdjustPattern();_setupTimingPattern();_setupTypeInfo(test,maskPattern);if(_typeNumber>=7){_setupTypeNumber(test);}if(_dataCache==null){_dataCache=_createData(_typeNumber,_errorCorrectLevel);}var data=_dataCache;var inc=-1,row=_moduleCount-1,bitIndex=7,byteIndex=0;for(var col=_moduleCount-1;col>0;col-=2){if(col==6)col--;while(true){for(var c=0;c<2;c++){if(_modules[row][col-c]==null){var dark=false;if(byteIndex<data.length){dark=((data[byteIndex]>>>bitIndex)&1)==1;}var mask=QRUtil.getMask(maskPattern,row,col-c);if(mask){dark=!dark;}_modules[row][col-c]=dark;bitIndex--;if(bitIndex==-1){byteIndex++;bitIndex=7;}}}row+=inc;if(row<0||_moduleCount<=row){row-=inc;inc=-inc;break;}}}};var _setupPositionProbePattern=function(row,col){for(var r=-1;r<=7;r++){if(row+r<=-1||_moduleCount<=row+r)continue;for(var c=-1;c<=7;c++){if(col+c<=-1||_moduleCount<=col+c)continue;if((0<=r&&r<=6&&(c==0||c==6))||(0<=c&&c<=6&&(r==0||r==6))||(2<=r&&r<=4&&2<=c&&c<=4)){_modules[row+r][col+c]=true;}else{_modules[row+r][col+c]=false;}}}};var _setupTimingPattern=function(){for(var r=8;r<_moduleCount-8;r++){if(_modules[r][6]!=null){continue;}_modules[r][6]=(r%2==0);}for(var c=8;c<_moduleCount-8;c++){if(_modules[6][c]!=null){continue;}_modules[6][c]=(c%2==0);}};var _setupPositionAdjustPattern=function(){var pos=QRUtil.getPatternPosition(_typeNumber);for(var i=0;i<pos.length;i++){for(var j=0;j<pos.length;j++){var row=pos[i],col=pos[j];if(_modules[row][col]!=null){continue;}for(var r=-2;r<=2;r++){for(var c=-2;c<=2;c++){if(r==-2||r==2||c==-2||c==2||(r==0&&c==0)){_modules[row+r][col+c]=true;}else{_modules[row+r][col+c]=false;}}}}}};var _setupTypeNumber=function(test){var bits=QRUtil.getBCHTypeNumber(_typeNumber);for(var i=0;i<18;i++){var mod=(!test&&((bits>>i)&1)==1);_modules[Math.floor(i/3)][i%3+_moduleCount-8-3]=mod;}for(var i=0;i<18;i++){var mod=(!test&&((bits>>i)&1)==1);_modules[i%3+_moduleCount-8-3][Math.floor(i/3)]=mod;}};var _setupTypeInfo=function(test,maskPattern){var data=(_errorCorrectLevel<<3)|maskPattern,bits=QRUtil.getBCHTypeInfo(data);for(var i=0;i<15;i++){var mod=(!test&&((bits>>i)&1)==1);if(i<6){_modules[i][8]=mod;}else if(i<8){_modules[i+1][8]=mod;}else{_modules[_moduleCount-15+i][8]=mod;}}for(var i=0;i<15;i++){var mod=(!test&&((bits>>i)&1)==1);if(i<8){_modules[8][_moduleCount-i-1]=mod;}else if(i<9){_modules[8][15-i-1+1]=mod;}else{_modules[8][15-i-1]=mod;}}_modules[_moduleCount-8][8]=(!test);};var _getBestMaskPattern=function(){var minLostPoint=0,pattern=0;for(var i=0;i<8;i++){_makeImpl(true,i);var lostPoint=QRUtil.getLostPoint(_this);if(i==0||minLostPoint>lostPoint){minLostPoint=lostPoint;pattern=i;}}return pattern;};_this.make=function(){_makeImpl(false,_getBestMaskPattern());};_this.getModuleCount=function(){return _moduleCount;};_this.isDark=function(row,col){if(row<0||_moduleCount<=row||col<0||_moduleCount<=col){throw row+','+col;}return _modules[row][col];};return _this;};var qrcodeNumber=function(data){var _data=data,_mode=1<<0,_this={};_this.getMode=function(){return _mode;};_this.getLength=function(){return _data.length;};_this.write=function(buffer){var i=0;while(i+2<_data.length){buffer.put(_parseInt(_data.substring(i,i+3)),10);i+=3;}if(i<_data.length){if(_data.length-i==1){buffer.put(_parseInt(_data.substring(i,i+1)),4);}else if(_data.length-i==2){buffer.put(_parseInt(_data.substring(i,i+2)),7);}}};var _parseInt=function(s){return parseInt(s,10);};return _this;};var qrcodeAlphaNum=function(data){var _data=data,_mode=1<<1,_this={};_this.getMode=function(){return _mode;};_this.getLength=function(){return _data.length;};_this.write=function(buffer){var i=0;while(i+1<_data.length){buffer.put(_getCode(_data.charAt(i))*45+_getCode(_data.charAt(i+1)),11);i+=2;}if(i<_data.length){buffer.put(_getCode(_data.charAt(i)),6);}};var _getCode=function(s){if(s>='0'&&s<='9'){return s.charCodeAt(0)-'0'.charCodeAt(0);}else if(s>='A'&&s<='Z'){return s.charCodeAt(0)-'A'.charCodeAt(0)+10;}else{switch(s){case ' ':return 36;case '$':return 37;case '%':return 38;case '*':return 39;case '+':return 40;case '-':return 41;case '.':return 42;case '/':return 43;case ':':return 44;default:throw 'illegal char :'+s;}}};return _this;};var qrcodeByte=function(data){var _data=data,_mode=1<<2,_this={};_this.getMode=function(){return _mode;};_this.getLength=function(){return _data.length;};_this.write=function(buffer){for(var i=0;i<_data.length;i++){buffer.put(_data.charCodeAt(i),8);}};return _this;};var qrcodeKanji=function(data){var _data=data,_mode=1<<3,_this={};_this.getMode=function(){return _mode;};_this.getLength=function(){return _data.length;};_this.write=function(buffer){for(var i=0;i<_data.length;i++){var code=_data.charCodeAt(i);if(0x8140<=code&&code<=0x9FFC){code-=0x8140;}else if(0xE040<=code&&code<=0xEBBF){code-=0xC140;}var msb=((code>>>8)&0xff),lsb=(code&0xff),encoded=(msb*0xC0)+lsb;buffer.put(encoded,13);}};return _this;};var QRRSBlock=function(){var RS_BLOCK_TABLE=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15],[2,33,11],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14],[4,39,13],[2,121,97],[2,60,38],[4,40,18],[4,40,14],[2,146,116],[3,58,36],[2,29,16],[4,36,12],[2,86,68],[4,69,43],[4,43,19],[4,43,15],[2,101,81],[4,69,43],[2,32,14],[4,39,13],[2,116,92],[4,69,43],[4,43,19],[4,43,15],[2,133,107],[3,61,36],[4,40,18],[4,40,14],[2,109,87],[4,58,36],[4,46,20],[4,46,16],[2,122,98],[4,69,43],[2,37,19],[4,44,14],[2,136,110],[4,64,41],[2,29,16],[4,36,12],[2,105,85],[4,58,36],[4,40,18],[4,40,14],[2,120,96],[4,69,43],[4,44,19],[4,44,15],[2,129,104],[4,69,43],[4,49,21],[4,49,17],[2,133,107],[3,61,36],[4,40,18],[4,40,14],[2,141,114],[4,62,38],[4,36,16],[4,36,12],[2,137,111],[4,69,43],[4,44,19],[4,44,15],[2,145,118],[4,69,43],[2,42,19],[4,42,14],[2,130,106],[5,61,36],[2,29,16],[4,36,12],[2,124,100],[5,61,36],[4,44,19],[4,44,15],[2,136,110],[5,61,36],[4,40,18],[4,40,14],[2,122,98],[5,61,36],[4,36,16],[4,36,12],[2,130,106],[5,61,36],[4,44,19],[4,44,15],[2,145,118],[5,61,36],[4,46,20],[4,46,16],[2,134,108],[5,61,36],[4,42,18],[4,42,14],[2,129,104],[5,61,36],[4,50,22],[4,50,18],[2,134,108],[5,61,36],[4,46,20],[4,46,16],[2,141,114],[5,61,36],[4,42,18],[4,42,14],[2,145,118],[5,61,36],[4,50,22],[4,50,18],[2,145,118],[5,61,36],[4,46,20],[4,46,16],[2,145,118],[5,61,36],[4,46,20],[4,46,16],[2,145,118],[5,61,36],[4,46,20],[4,46,16]];return{getRSBlocks:function(typeNumber,errorCorrectLevel){var rsBlock=this.getRsBlockTable(typeNumber,errorCorrectLevel);if(rsBlock==undefined){throw 'bad rs block';}var length=rsBlock.length/3,list=[];for(var i=0;i<length;i++){var count=rsBlock[i*3+0],totalCount=rsBlock[i*3+1],dataCount=rsBlock[i*3+2];for(var j=0;j<count;j++){list.push(new QRRSBlock(totalCount,dataCount));}}return list;},getRsBlockTable:function(typeNumber,errorCorrectLevel){switch(errorCorrectLevel){case QRErrorCorrectLevel.L:return RS_BLOCK_TABLE[(typeNumber-1)*4+0];case QRErrorCorrectLevel.M:return RS_BLOCK_TABLE[(typeNumber-1)*4+1];case QRErrorCorrectLevel.Q:return RS_BLOCK_TABLE[(typeNumber-1)*4+2];case QRErrorCorrectLevel.H:return RS_BLOCK_TABLE[(typeNumber-1)*4+3];default:return undefined;}}};}();var QRRSBlock=function(totalCount,dataCount){var _this={};_this.totalCount=totalCount;_this.dataCount=dataCount;return _this;};var QRPolynomial=function(num,shift){var _num=num,_shift=shift,_this={};_this.getLength=function(){return _num.length;};_this.get=function(index){return _num[index];};_this.multiply=function(e){var num=new Array(_num.length+e.length-1);for(var i=0;i<num.length;i++){num[i]=0;}for(var i=0;i<_num.length;i++){for(var j=0;j<e.length;j++){num[i+j]^=QRMath.glog(QRMath.glog(_num[i])+QRMath.glog(e[j]));}}return new QRPolynomial(num,0);};_this.mod=function(e){if(_num.length-e.getLength()<0){return _this;}var ratio=QRMath.glog(_num[0])-QRMath.glog(e.get(0)),num=new Array(_num.length);for(var i=0;i<num.length;i++){num[i]=_num[i];}for(var i=0;i<e.getLength();i++){num[i]^=QRMath.gexp(QRMath.glog(e.get(i))+ratio);}return new QRPolynomial(num,0).mod(e);};return _this;};var QRMath=function(){var EXP_TABLE=new Array(256),LOG_TABLE=new Array(256);for(var i=0;i<8;i++){EXP_TABLE[i]=1<<i;}for(var i=8;i<256;i++){EXP_TABLE[i]=EXP_TABLE[i-4]^EXP_TABLE[i-5]^EXP_TABLE[i-6]^EXP_TABLE[i-8];}for(var i=0;i<255;i++){LOG_TABLE[EXP_TABLE[i]]=i;}return{glog:function(n){if(n<1){throw 'glog('+n+')';}return LOG_TABLE[n];},gexp:function(n){while(n<0){n+=255;}while(n>=256){n-=255;}return EXP_TABLE[n];}};}();var QRBitBuffer=function(){var _buffer=[],_length=0,_this={};_this.getBuffer=function(){return _buffer;};_this.getLengthInBits=function(){return _length;};_this.put=function(num,length){for(var i=0;i<length;i++){_this.putBit(((num>>>(length-i-1))&1)==1);}};_this.putBit=function(bit){var bufIndex=Math.floor(_length/8);if(_buffer.length<=bufIndex){_buffer.push(0);}if(bit){_buffer[bufIndex]|=(0x80>>>(_length%8));}_length++;};return _this;};var QRUtil=function(){var PATTERN_POSITION_TABLE=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]];return{getBCHTypeInfo:function(data){var d=data<<10;while(this.getBCHDigit(d)-this.getBCHDigit(0x537)>=0){d^=(0x537<<(this.getBCHDigit(d)-this.getBCHDigit(0x537)));}return((data<<10)|d)^0x5412;},getBCHTypeNumber:function(data){var d=data<<12;while(this.getBCHDigit(d)-this.getBCHDigit(0x1f25)>=0){d^=(0x1f25<<(this.getBCHDigit(d)-this.getBCHDigit(0x1f25)));}return(data<<12)|d;},getBCHDigit:function(data){var digit=0;while(data!=0){digit++;data>>>=1;}return digit;},getPatternPosition:function(typeNumber){return PATTERN_POSITION_TABLE[typeNumber-1];},getMask:function(maskPattern,i,j){switch(maskPattern){case 0:return(i+j)%2==0;case 1:return i%2==0;case 2:return j%3==0;case 3:return(i+j)%3==0;case 4:return(Math.floor(i/2)+Math.floor(j/3))%2==0;case 5:return(i*j)%2+(i*j)%3==0;case 6:return((i*j)%2+(i*j)%3)%2==0;case 7:return((i*j)%3+(i+j)%2)%2==0;default:throw 'bad maskPattern:'+maskPattern;}},getErrorCorrectPolynomial:function(errorCorrectLength){var a=new QRPolynomial([1],0);for(var i=0;i<errorCorrectLength;i++){a=a.multiply(new QRPolynomial([1,QRMath.gexp(i)],0));}return a;},getLengthInBits:function(mode,type){if(1<=type&&type<10){switch(mode){case 1<<0:return 10;case 1<<1:return 9;case 1<<2:return 8;case 1<<3:return 8;default:throw 'mode:'+mode;}}else if(type<27){switch(mode){case 1<<0:return 12;case 1<<1:return 11;case 1<<2:return 16;case 1<<3:return 10;default:throw 'mode:'+mode;}}else if(type<41){switch(mode){case 1<<0:return 14;case 1<<1:return 13;case 1<<2:return 16;case 1<<3:return 12;default:throw 'mode:'+mode;}}else{throw 'type:'+type;}},getLostPoint:function(qrCode){var moduleCount=qrCode.getModuleCount(),lostPoint=0;for(var row=0;row<moduleCount;row++){for(var col=0;col<moduleCount;col++){var sameCount=0,dark=qrCode.isDark(row,col);for(var r=-1;r<=1;r++){if(row+r<0||moduleCount<=row+r){continue;}for(var c=-1;c<=1;c++){if(col+c<0||moduleCount<=col+c){continue;}if(r==0&&c==0){continue;}if(dark==qrCode.isDark(row+r,col+c)){sameCount++;}}}if(sameCount>5){lostPoint+=(3+sameCount-5);}}}for(var row=0;row<moduleCount-1;row++){for(var col=0;col<moduleCount-1;col++){var count=0;if(qrCode.isDark(row,col))count++;if(qrCode.isDark(row+1,col))count++;if(qrCode.isDark(row,col+1))count++;if(qrCode.isDark(row+1,col+1))count++;if(count==0||count==4){lostPoint+=3;}}}for(var row=0;row<moduleCount;row++){for(var col=0;col<moduleCount-6;col++){if(qrCode.isDark(row,col)&&!qrCode.isDark(row,col+1)&&qrCode.isDark(row,col+2)&&qrCode.isDark(row,col+3)&&qrCode.isDark(row,col+4)&&!qrCode.isDark(row,col+5)&&qrCode.isDark(row,col+6)){lostPoint+=40;}}}for(var col=0;col<moduleCount;col++){for(var row=0;row<moduleCount-6;row++){if(qrCode.isDark(row,col)&&!qrCode.isDark(row+1,col)&&qrCode.isDark(row+2,col)&&qrCode.isDark(row+3,col)&&qrCode.isDark(row+4,col)&&!qrCode.isDark(row+5,col)&&qrCode.isDark(row+6,col)){lostPoint+=40;}}}var darkCount=0;for(var col=0;col<moduleCount;col++){for(var row=0;row<moduleCount;row++){if(qrCode.isDark(row,col)){darkCount++;}}}var ratio=Math.abs(100*darkCount/moduleCount/moduleCount-50)/5;lostPoint+=ratio*10;return lostPoint;}};}();var QRErrorCorrectLevel={L:1,M:0,Q:3,H:2};
+    return qrcode;
+    }();
+  </script></template>
+  <script src="./qrcode-generator.min.js"></script>
+
+  <!-- الكود التشغيلي للتطبيق -->
   <script>
     const STORAGE_KEY = 'van_sales_mobile_invoices_v1';
     const CUSTOMERS_KEY = 'van_sales_customers_v1';
@@ -512,11 +281,13 @@
     const MASTER_DATA_KEY = 'van_sales_master_data_v1';
     const DAYS_KEY = 'van_sales_days_v1';
     const ACTIVE_DAY_KEY = 'van_sales_active_day_v1';
+  const STORE_SETTINGS_KEY = 'van_sales_store_settings_v1';
 
     const state = {
       invoices: loadInvoices(),
       customers: loadCustomers(),
       products: loadProducts(),
+        storeSettings: loadStoreSettings(),
       days: loadDays(),
       activeDayId: localStorage.getItem(ACTIVE_DAY_KEY) || localDayId(),
       reportDayId: null,
@@ -527,6 +298,7 @@
     const phoneInput = document.getElementById('phone');
     const notesInput = document.getElementById('notes');
     const paidCashInput = document.getElementById('paidCash');
+      const paymentModeInput = document.getElementById('paymentMode');
     const itemsContainer = document.getElementById('itemsContainer');
     const invoiceList = document.getElementById('invoiceList');
     const customerList = document.getElementById('customerList');
@@ -535,15 +307,8 @@
     const payloadBox = document.getElementById('payloadBox');
     const qrModal = document.getElementById('qrModal');
 
-    function uid() {
-      return 'v' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
-    }
-
-    function safeNumber(value, fallback = 0) {
-      const n = Number(value);
-      return Number.isFinite(n) ? n : fallback;
-    }
-
+    function uid() { return 'v' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10); }
+    function safeNumber(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) ? n : fallback; }
     function localDayId(date = new Date()) {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -551,31 +316,33 @@
       return `${year}-${month}-${day}`;
     }
 
-    function formatMoney(value) {
-      return Number(value || 0).toLocaleString('ar-EG', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    }
+    function formatMoney(value) { return Number(value || 0).toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+        function loadStoreSettings() {
+          try { return JSON.parse(localStorage.getItem(STORE_SETTINGS_KEY) || '{}'); }
+          catch { return {}; }
+        }
 
-    function loadInvoices() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const invoices = raw ? JSON.parse(raw) : [];
-        return invoices.map(invoice => ({
-          ...invoice,
-          dayId: invoice.dayId || localDayId(new Date(invoice.createdAt || invoice.date || Date.now()))
-        }));
-      } catch { return []; }
-    }
+        function renderStoreSettings() {
+          document.getElementById('storeNameInput').value = state.storeSettings.name || '';
+          document.getElementById('storeAddressInput').value = state.storeSettings.address || '';
+          document.getElementById('storePhoneInput').value = state.storeSettings.phone || '';
+          document.getElementById('storeNameCaption').textContent = state.storeSettings.name || '';
+        }
 
-    function loadDays() {
-      try {
-        const raw = localStorage.getItem(DAYS_KEY);
-        return raw ? JSON.parse(raw) : [];
-      } catch { return []; }
-    }
+        function saveStoreSettings() {
+          state.storeSettings = {
+            name: document.getElementById('storeNameInput').value.trim(),
+            address: document.getElementById('storeAddressInput').value.trim(),
+            phone: document.getElementById('storePhoneInput').value.trim()
+          };
+          localStorage.setItem(STORE_SETTINGS_KEY, JSON.stringify(state.storeSettings));
+          renderStoreSettings();
+          document.getElementById('settingsStatus').textContent = 'تم حفظ بيانات المتجر على هذا الجهاز.';
+        }
 
+    function loadInvoices() { try { const raw = localStorage.getItem(STORAGE_KEY); const invoices = raw ? JSON.parse(raw) : []; return invoices.map(invoice => ({ ...invoice, dayId: invoice.dayId || localDayId(new Date(invoice.createdAt || invoice.date || Date.now())) })); } catch { return []; } }
+    function loadDays() { try { const raw = localStorage.getItem(DAYS_KEY); return raw ? JSON.parse(raw) : []; } catch { return []; } }
+    
     function saveDays() {
       localStorage.setItem(DAYS_KEY, JSON.stringify(state.days));
       localStorage.setItem(ACTIVE_DAY_KEY, state.activeDayId);
@@ -583,95 +350,42 @@
     }
 
     function ensureActiveDay() {
-      if (!state.days.some(day => day.id === state.activeDayId)) {
-        state.days.push({ id: state.activeDayId, label: state.activeDayId, startedAt: Date.now() });
-      }
-      state.invoices.forEach(invoice => {
-        if (!state.days.some(day => day.id === invoice.dayId)) {
-          state.days.push({ id: invoice.dayId, label: invoice.dayId, startedAt: invoice.createdAt || Date.now() });
-        }
-      });
+      if (!state.days.some(day => day.id === state.activeDayId)) { state.days.push({ id: state.activeDayId, label: state.activeDayId, startedAt: Date.now() }); }
+      state.invoices.forEach(invoice => { if (!state.days.some(day => day.id === invoice.dayId)) { state.days.push({ id: invoice.dayId, label: invoice.dayId, startedAt: invoice.createdAt || Date.now() }); } });
       saveDays();
     }
 
-    function saveInvoices() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.invoices));
-      renderSummary();
-      renderInvoiceList();
-      renderDayOptions();
-    }
-
-    function loadCustomers() {
-      try {
-        const raw = localStorage.getItem(CUSTOMERS_KEY);
-        return raw ? JSON.parse(raw) : [];
-      } catch { return []; }
-    }
-
-    function loadProducts() {
-      try {
-        const raw = localStorage.getItem(PRODUCTS_KEY);
-        return raw ? JSON.parse(raw) : [];
-      } catch { return []; }
-    }
-
-    function saveCustomers() {
-      localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(state.customers));
-      renderCustomerSuggestions();
-    }
-
-    function saveProducts() {
-      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(state.products));
-      renderProductSuggestions();
-    }
-
-    function renderCustomerSuggestions() {
-      const names = [...new Set(state.customers.map(c => c.name).filter(Boolean))];
-      customerList.innerHTML = names.map(name => `<option value="${escapeHtml(name)}"></option>`).join('');
-    }
-
-    function renderProductSuggestions() {
-      const names = [...new Set(state.products.map(p => p.name).filter(Boolean))];
-      const productListNode = document.getElementById('productList');
-      productListNode.innerHTML = names.map(name => `<option value="${escapeHtml(name)}"></option>`).join('');
-    }
+    function saveInvoices() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.invoices)); renderSummary(); renderInvoiceList(); renderDayOptions(); }
+    function loadCustomers() { try { const raw = localStorage.getItem(CUSTOMERS_KEY); return raw ? JSON.parse(raw) : []; } catch { return []; } }
+    function loadProducts() { try { const raw = localStorage.getItem(PRODUCTS_KEY); return raw ? JSON.parse(raw) : []; } catch { return []; } }
+    function saveCustomers() { localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(state.customers)); renderCustomerSuggestions(); }
+    function saveProducts() { localStorage.setItem(PRODUCTS_KEY, JSON.stringify(state.products)); renderProductSuggestions(); }
+    function renderCustomerSuggestions() { const names = [...new Set(state.customers.map(c => c.name).filter(Boolean))]; customerList.innerHTML = names.map(name => `<option value="${escapeHtml(name)}"></option>`).join(''); }
+    function renderProductSuggestions() { const names = [...new Set(state.products.map(p => p.name).filter(Boolean))]; const productListNode = document.getElementById('productList'); productListNode.innerHTML = names.map(name => `<option value="${escapeHtml(name)}"></option>`).join(''); }
 
     function renderDayOptions() {
       const dayIds = new Set(state.days.map(day => day.id));
       state.invoices.forEach(invoice => dayIds.add(invoice.dayId));
       dayIds.add(state.activeDayId);
-      const days = [...dayIds].map(id => state.days.find(day => day.id === id) || { id, label: id })
-        .sort((a, b) => (b.startedAt || b.id).toString().localeCompare((a.startedAt || a.id).toString()));
+      const days = [...dayIds].map(id => state.days.find(day => day.id === id) || { id, label: id }).sort((a, b) => (b.startedAt || b.id).toString().localeCompare((a.startedAt || a.id).toString()));
       reportDaySelect.innerHTML = days.map(day => `<option value="${escapeHtml(day.id)}">${escapeHtml(day.label || day.id)}${day.id === state.activeDayId ? ' (نشط)' : ''}</option>`).join('');
       if (!state.reportDayId || !dayIds.has(state.reportDayId)) state.reportDayId = state.activeDayId;
       reportDaySelect.value = state.reportDayId;
       renderDaySummary();
     }
 
-    function escapeHtml(str = '') {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
+    function escapeHtml(str = '') { return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
 
     function findProductByName(name) {
       const normalized = (name || '').trim().toLowerCase();
-      return state.products.find(product =>
-        (product.name || '').trim().toLowerCase() === normalized ||
-        (product.barcode || '').trim().toLowerCase() === normalized
-      ) || null;
+      return state.products.find(product => (product.name || '').trim().toLowerCase() === normalized || (product.barcode || '').trim().toLowerCase() === normalized ) || null;
     }
 
     function applyProductPriceIfMatched(nameInput, priceInput) {
       const product = findProductByName(nameInput.value);
       if (!product) return;
       nameInput.value = product.name;
-      if (safeNumber(priceInput.value, 0) === 0 || safeNumber(priceInput.value, 0) <= 0.01) {
-        priceInput.value = Number(product.price || product.unitPrice || 0).toFixed(2);
-      }
+      if (safeNumber(priceInput.value, 0) === 0 || safeNumber(priceInput.value, 0) <= 0.01) { priceInput.value = Number(product.price || product.unitPrice || 0).toFixed(2); }
     }
 
     function createItemRow(item = { name: '', qty: 1, unitPrice: 0 }) {
@@ -683,22 +397,10 @@
           <button class="remove-item" type="button">حذف</button>
         </div>
         <div class="item-grid">
-          <div>
-            <label>اسم الصنف</label>
-            <input class="item-name" list="productList" type="text" value="${escapeHtml(item.name)}" placeholder="اسم المنتج" />
-          </div>
-          <div>
-            <label>الكمية</label>
-            <input class="item-qty" type="number" min="1" step="1" value="${safeNumber(item.qty, 1)}" />
-          </div>
-          <div>
-            <label>سعر الوحدة</label>
-            <input class="item-price" type="number" min="0" step="0.01" value="${safeNumber(item.unitPrice, 0)}" />
-          </div>
-          <div>
-            <label>الإجمالي</label>
-            <input class="item-total" type="text" value="${formatMoney((safeNumber(item.qty, 1) * safeNumber(item.unitPrice, 0)))}" readonly />
-          </div>
+          <div><label>اسم الصنف</label><input class="item-name" list="productList" type="text" value="${escapeHtml(item.name)}" placeholder="اسم المنتج" /></div>
+          <div><label>الكمية</label><input class="item-qty" type="number" min="1" step="1" value="${safeNumber(item.qty, 1)}" /></div>
+          <div><label>سعر الوحدة</label><input class="item-price" type="number" min="0" step="0.01" value="${safeNumber(item.unitPrice, 0)}" /></div>
+          <div><label>الإجمالي</label><input class="item-total" type="text" value="${formatMoney((safeNumber(item.qty, 1) * safeNumber(item.unitPrice, 0)))}" readonly /></div>
         </div>
       `;
 
@@ -721,35 +423,19 @@
       nameInput.addEventListener('change', () => { applyProductPriceIfMatched(nameInput, priceInput); recalc(); });
       nameInput.addEventListener('blur', () => { applyProductPriceIfMatched(nameInput, priceInput); recalc(); });
       nameInput.addEventListener('input', recalc);
-      removeBtn.addEventListener('click', () => {
-        row.remove();
-        recalcTotals();
-      });
-
-      recalc();
-      return row;
+      removeBtn.addEventListener('click', () => { row.remove(); recalcTotals(); });
+      recalc(); return row;
     }
 
-    function addItemRow(item = { name: '', qty: 1, unitPrice: 0 }) {
-      const row = createItemRow(item);
-      itemsContainer.appendChild(row);
-    }
+    function addItemRow(item = { name: '', qty: 1, unitPrice: 0 }) { itemsContainer.appendChild(createItemRow(item)); }
 
     function readItems() {
       const items = [];
-      const rows = [...itemsContainer.querySelectorAll('.item-row')];
-      rows.forEach((row) => {
+      [...itemsContainer.querySelectorAll('.item-row')].forEach((row) => {
         const itemName = row.querySelector('.item-name').value.trim();
         const qty = safeNumber(row.querySelector('.item-qty').value, 0);
         const unitPrice = safeNumber(row.querySelector('.item-price').value, 0);
-        if (itemName || qty > 0 || unitPrice > 0) {
-          items.push({
-            name: itemName,
-            qty,
-            unitPrice,
-            total: qty * unitPrice
-          });
-        }
+        if (itemName || qty > 0 || unitPrice > 0) { items.push({ name: itemName, qty, unitPrice, total: qty * unitPrice }); }
       });
       return items;
     }
@@ -757,9 +443,12 @@
     function recalcTotals() {
       const items = readItems();
       const subtotal = items.reduce((sum, item) => sum + item.total, 0);
-      const paidCash = safeNumber(paidCashInput.value, 0);
+      const mode = paymentModeInput.value;
+      const paidCash = mode === 'cash' ? subtotal : mode === 'credit' ? 0 : Math.min(subtotal, Math.max(0, safeNumber(paidCashInput.value, 0)));
+      paidCashInput.disabled = mode !== 'partial';
+      paidCashInput.value = paidCash.toFixed(2);
+      document.getElementById('paymentHint').textContent = mode === 'cash' ? 'سيتم تسجيل كامل الفاتورة نقداً.' : mode === 'credit' ? 'تُسجل الفاتورة على الحساب.' : 'أدخل قيمة الدفعة، والباقي يسجل آجل.';
       const balance = subtotal - paidCash;
-
       document.getElementById('subTotalText').textContent = formatMoney(subtotal);
       document.getElementById('paidText').textContent = formatMoney(paidCash);
       document.getElementById('balanceText').textContent = formatMoney(balance);
@@ -771,7 +460,6 @@
       const totalSales = todayInvoices.reduce((sum, inv) => sum + safeNumber(inv.total), 0);
       const cashCollected = todayInvoices.reduce((sum, inv) => sum + safeNumber(inv.paidCash), 0);
       const creditTotal = todayInvoices.reduce((sum, inv) => sum + Math.max(0, safeNumber(inv.balance)), 0);
-
       document.getElementById('totalSales').textContent = formatMoney(totalSales);
       document.getElementById('cashCollected').textContent = formatMoney(cashCollected);
       document.getElementById('creditTotal').textContent = formatMoney(creditTotal);
@@ -782,15 +470,8 @@
       invoiceList.innerHTML = '';
       const dayInvoices = state.invoices.filter(inv => inv.dayId === (state.reportDayId || state.activeDayId));
       renderDaySummary();
-      if (!dayInvoices.length) {
-        invoiceList.innerHTML = '<div class="empty">لا توجد فواتير في هذه اليومية.</div>';
-        return;
-      }
-
-      dayInvoices
-        .slice()
-        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-        .forEach((invoice) => {
+      if (!dayInvoices.length) { invoiceList.innerHTML = '<div class="empty">لا توجد فواتير في هذه اليومية.</div>'; return; }
+      dayInvoices.slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).forEach((invoice) => {
           const box = document.createElement('div');
           box.className = 'invoice-item';
           box.innerHTML = `
@@ -809,19 +490,15 @@
             </div>
             <div class="invoice-actions">
               <button type="button" class="small-btn secondary" data-edit="${invoice.id}">تعديل</button>
+              <button type="button" class="small-btn secondary" data-print="${invoice.id}">طباعة / PDF</button>
               <button type="button" class="small-btn danger" data-delete="${invoice.id}">حذف</button>
             </div>
           `;
           invoiceList.appendChild(box);
         });
-
-      invoiceList.querySelectorAll('[data-delete]').forEach(btn => {
-        btn.addEventListener('click', () => deleteInvoice(btn.getAttribute('data-delete')));
-      });
-
-      invoiceList.querySelectorAll('[data-edit]').forEach(btn => {
-        btn.addEventListener('click', () => editInvoice(btn.getAttribute('data-edit')));
-      });
+      invoiceList.querySelectorAll('[data-delete]').forEach(btn => { btn.addEventListener('click', () => deleteInvoice(btn.getAttribute('data-delete'))); });
+      invoiceList.querySelectorAll('[data-edit]').forEach(btn => { btn.addEventListener('click', () => editInvoice(btn.getAttribute('data-edit'))); });
+      invoiceList.querySelectorAll('[data-print]').forEach(btn => { btn.addEventListener('click', () => printInvoice(btn.getAttribute('data-print'))); });
     }
 
     function renderDaySummary() {
@@ -831,27 +508,19 @@
       const total = invoices.reduce((sum, invoice) => sum + safeNumber(invoice.total), 0);
       const cash = invoices.reduce((sum, invoice) => sum + safeNumber(invoice.paidCash), 0);
       const credit = invoices.reduce((sum, invoice) => sum + safeNumber(invoice.balance), 0);
-      document.getElementById('selectedDaySummary').textContent =
-        `الفواتير: ${invoices.length} · المبيعات: ${formatMoney(total)} · النقدية: ${formatMoney(cash)} · الآجل: ${formatMoney(credit)}`;
+      document.getElementById('selectedDaySummary').textContent = `الفواتير: ${invoices.length} · المبيعات: ${formatMoney(total)} · النقدية: ${formatMoney(cash)} · الآجل: ${formatMoney(credit)}`;
     }
 
-    function deleteInvoice(id) {
-      state.invoices = state.invoices.filter(inv => inv.id !== id);
-      saveInvoices();
-    }
+    function deleteInvoice(id) { state.invoices = state.invoices.filter(inv => inv.id !== id); saveInvoices(); }
 
     function editInvoice(id) {
       const inv = state.invoices.find(item => item.id === id);
       if (!inv) return;
-      customerNameInput.value = inv.customerName || '';
-      phoneInput.value = inv.customerPhone || '';
-      notesInput.value = inv.notes || '';
-      paidCashInput.value = inv.paidCash || 0;
-      itemsContainer.innerHTML = '';
-      (inv.items || []).forEach(item => addItemRow(item));
-      state.selectedInvoiceId = id;
-      recalcTotals();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      customerNameInput.value = inv.customerName || ''; phoneInput.value = inv.customerPhone || '';
+      notesInput.value = inv.notes || ''; paidCashInput.value = inv.paidCash || 0;
+      paymentModeInput.value = inv.balance <= 0 ? 'cash' : inv.paidCash > 0 ? 'partial' : 'credit';
+      itemsContainer.innerHTML = ''; (inv.items || []).forEach(item => addItemRow(item));
+      state.selectedInvoiceId = id; recalcTotals(); window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function prepareInvoiceFromForm() {
@@ -862,143 +531,75 @@
       const customerPhone = phoneInput.value.trim();
       const notes = notesInput.value.trim();
 
-      if (!customerName) {
-        alert('يرجى إدخال اسم العميل قبل حفظ الفاتورة.');
-        return null;
-      }
-      if (!items.length) {
-        alert('يرجى إضافة صنف واحد على الأقل.');
-        return null;
-      }
+      if (!customerName) { alert('يرجى إدخال اسم العميل قبل حفظ الفاتورة.'); return null; }
+      if (!items.length) { alert('يرجى إضافة صنف واحد على الأقل.'); return null; }
 
       const existingInvoice = state.invoices.find(item => item.id === state.selectedInvoiceId);
       const invoice = {
-        id: state.selectedInvoiceId || uid(),
-        customerName,
-        customerPhone,
-        notes,
-        items,
-        total: subtotal,
-        paidCash,
-        balance: Math.max(0, subtotal - paidCash),
+        id: state.selectedInvoiceId || uid(), customerName, customerPhone, notes, items,
+        total: subtotal, paidCash, balance: Math.max(0, subtotal - paidCash),
         createdAt: existingInvoice?.createdAt || Date.now(),
         date: existingInvoice?.date || new Date().toISOString(),
         dayId: existingInvoice?.dayId || state.activeDayId
       };
 
       if (!state.customers.some(c => c.name.toLowerCase() === customerName.toLowerCase())) {
-        state.customers.push({ name: customerName, phone: customerPhone, createdAt: Date.now() });
-        saveCustomers();
+        state.customers.push({ name: customerName, phone: customerPhone, createdAt: Date.now() }); saveCustomers();
       }
-
       return invoice;
     }
 
     function saveInvoice() {
       const invoice = prepareInvoiceFromForm();
       if (!invoice) return;
-
       const targetIndex = state.invoices.findIndex(inv => inv.id === invoice.id);
-      if (targetIndex >= 0) {
-        state.invoices[targetIndex] = invoice;
-      } else {
-        state.invoices.push(invoice);
-      }
-
-      saveInvoices();
-      resetForm();
-      alert('تم حفظ الفاتورة محلياً بنجاح.');
+      if (targetIndex >= 0) { state.invoices[targetIndex] = invoice; } else { state.invoices.push(invoice); }
+      saveInvoices(); resetForm(); alert('تم حفظ الفاتورة محلياً بنجاح.');
     }
 
     function resetForm() {
-      customerNameInput.value = '';
-      phoneInput.value = '';
-      notesInput.value = '';
-      paidCashInput.value = 0;
-      itemsContainer.innerHTML = '';
-      addItemRow();
-      state.selectedInvoiceId = null;
-      recalcTotals();
+      customerNameInput.value = ''; phoneInput.value = ''; notesInput.value = ''; paidCashInput.value = 0; paymentModeInput.value = 'credit';
+      itemsContainer.innerHTML = ''; addItemRow(); state.selectedInvoiceId = null; recalcTotals();
     }
 
-    function chunkString(str, chunkSize) {
-      const result = [];
-      for (let i = 0; i < str.length; i += chunkSize) {
-        result.push(str.slice(i, i + chunkSize));
-      }
-      return result;
-    }
-
-    function b64EncodeUnicode(str) {
-      return btoa(unescape(encodeURIComponent(str)));
-    }
-
-    function b64DecodeUnicode(str) {
-      return decodeURIComponent(escape(atob(str)));
-    }
-
-    function safeHash(input) {
-      let hash = 0;
-      for (let i = 0; i < input.length; i++) {
-        hash = ((hash << 5) - hash) + input.charCodeAt(i);
-        hash |= 0;
-      }
-      return Math.abs(hash).toString(16);
-    }
+    function chunkString(str, chunkSize) { const result = []; for (let i = 0; i < str.length; i += chunkSize) { result.push(str.slice(i, i + chunkSize)); } return result; }
+    function b64EncodeUnicode(str) { return btoa(unescape(encodeURIComponent(str))); }
+    function safeHash(input) { let hash = 0; for (let i = 0; i < input.length; i++) { hash = ((hash << 5) - hash) + input.charCodeAt(i); hash |= 0; } return Math.abs(hash).toString(16); }
 
     function createTransferEnvelope() {
       const selectedDayId = state.reportDayId || state.activeDayId;
       const todayInvoices = state.invoices.filter(inv => inv.dayId === selectedDayId && !inv.exportedAt);
       const payload = {
-        version: 1,
-        app: 'van-sales-mobile',
-        deviceId: 'sales-phone-' + Math.random().toString(16).slice(2, 8),
-        generatedAt: new Date().toISOString(),
-        merchant: 'Main Store',
+        version: 1, app: 'van-sales-mobile', deviceId: 'sales-phone-' + Math.random().toString(16).slice(2, 8),
+        generatedAt: new Date().toISOString(), merchant: 'Main Store',
         invoices: todayInvoices.map(inv => ({
-          id: inv.id,
-          customerName: inv.customerName,
-          customerPhone: inv.customerPhone || '',
-          notes: inv.notes || '',
-          items: inv.items,
-          total: Number(inv.total || 0),
-          paidCash: Number(inv.paidCash || 0),
-          balance: Number(inv.balance || 0),
-          createdAt: inv.createdAt,
-          date: inv.date || new Date(inv.createdAt).toISOString(),
-          dayId: inv.dayId || state.activeDayId
+          id: inv.id, customerName: inv.customerName, customerPhone: inv.customerPhone || '', notes: inv.notes || '',
+          items: inv.items, total: Number(inv.total || 0), paidCash: Number(inv.paidCash || 0), balance: Number(inv.balance || 0),
+          createdAt: inv.createdAt, date: inv.date || new Date(inv.createdAt).toISOString(), dayId: inv.dayId || state.activeDayId
         }))
       };
 
-      const raw = JSON.stringify(payload);
-      const encoded = b64EncodeUnicode(raw);
-      const checksum = safeHash(raw);
-
-      if (encoded.length <= 1200) {
-        return {
-          type: 'single',
-          payload: encoded,
-          checksum,
-          totalInvoices: payload.invoices.length
-        };
-      }
-
+      const raw = JSON.stringify(payload); const encoded = b64EncodeUnicode(raw); const checksum = safeHash(raw);
+      if (encoded.length <= 1200) { return { type: 'single', payload: encoded, checksum, totalInvoices: payload.invoices.length }; }
       const chunks = chunkString(encoded, 1000);
-      return {
-        type: 'chunked',
-        chunkSize: 1000,
-        totalChunks: chunks.length,
-        chunks: chunks.map((chunk, idx) => ({ index: idx + 1, data: chunk })),
-        checksum,
-        totalInvoices: payload.invoices.length
-      };
+      return { type: 'chunked', chunkSize: 1000, totalChunks: chunks.length, chunks: chunks.map((chunk, idx) => ({ index: idx + 1, data: chunk })), checksum, totalInvoices: payload.invoices.length };
     }
 
     function generateQrCode(data) {
-      qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
-      const code = qrcode(0, 'M');
-      code.addData(data, 'Byte');
-      code.make();
+      if (qrcode.stringToBytesFuncs?.['UTF-8']) qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
+      let code = null;
+      for (let version = 1; version <= 40; version++) {
+        const candidate = qrcode(version, 'M');
+        candidate.addData(data, 'Byte');
+        try {
+          candidate.make();
+          code = candidate;
+          break;
+        } catch (error) {
+          if (!String(error).includes('code length overflow')) throw error;
+        }
+      }
+      if (!code) throw new Error('حمولة الرمز أكبر من السعة القصوى لـ QR. حمّل ملف JSON بدلاً من ذلك.');
       const size = code.getModuleCount();
       const cell = Math.max(3, Math.floor(300 / (size + 8)));
       const margin = cell * 4;
@@ -1011,67 +612,83 @@
       ctx.fillStyle = '#111827';
       for (let row = 0; row < size; row++) {
         for (let col = 0; col < size; col++) {
-          if (code.isDark(row, col)) {
-            ctx.fillRect(margin + col * cell, margin + row * cell, cell, cell);
-          }
+          if (code.isDark(row, col)) { ctx.fillRect(margin + col * cell, margin + row * cell, cell, cell); }
         }
       }
     }
 
     function showQrModal() {
       const envelope = createTransferEnvelope();
-      if (!envelope.totalInvoices) {
-        alert('لا توجد فواتير غير مُرحّلة في اليومية المختارة.');
-        return;
-      }
+      if (!envelope.totalInvoices) { alert('لا توجد فواتير غير مُرحّلة في اليومية المختارة.'); return; }
       const text = JSON.stringify(envelope, null, 2);
       payloadBox.textContent = text;
       if (envelope.type === 'single') {
-        generateQrCode(text);
-        qrCanvas.hidden = false;
-      } else {
-        qrCanvas.hidden = true;
-        alert('عدد الفواتير كبير لرمز واحد. استخدم تحميل JSON لاستيراد اليومية كاملة.');
+        try {
+          generateQrCode(text);
+          qrCanvas.hidden = false;
+        } catch (error) {
+          alert('تعذر توليد QR: ' + (error.message || error));
+          return;
+        }
       }
-      qrModal.classList.add('open');
-      qrModal.setAttribute('aria-hidden', 'false');
+      else { qrCanvas.hidden = true; alert('عدد الفواتير كبير لرمز واحد. استخدم تحميل JSON لاستيراد اليومية كاملة.'); }
+      qrModal.classList.add('open'); qrModal.setAttribute('aria-hidden', 'false');
     }
 
-    function closeQrModal() {
-      qrModal.classList.remove('open');
-      qrModal.setAttribute('aria-hidden', 'true');
-    }
+    function closeQrModal() { qrModal.classList.remove('open'); qrModal.setAttribute('aria-hidden', 'true'); }
 
     function copyPayloadToClipboard() {
-      const text = payloadBox.textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        alert('تم نسخ نص Payload إلى الحافظة.');
-      }).catch(() => {
-        alert('تعذر النسخ تلقائياً، يمكنك نسخ النص يدويًا.');
-      });
+      navigator.clipboard.writeText(payloadBox.textContent).then(() => { alert('تم نسخ نص Payload إلى الحافظة.'); }).catch(() => { alert('تعذر النسخ تلقائياً، يمكنك نسخ النص يدويًا.'); });
     }
 
     function downloadPayload() {
-      const text = payloadBox.textContent;
-      const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+      const blob = new Blob([payloadBox.textContent], { type: 'application/json;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = url;
-      link.download = 'van-sales-payload.json';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      link.href = url; link.download = 'van-sales-payload.json';
+      document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+    }
+
+    function openPrintDocument(title, content) {
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        alert('اسمح بفتح نافذة الطباعة لهذا التطبيق، ثم اختر حفظ كملف PDF.');
+        return;
+      }
+      const store = state.storeSettings;
+      printWindow.document.open();
+      printWindow.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>
+        *{box-sizing:border-box}body{font-family:Tahoma,Arial,sans-serif;color:#172033;margin:0;padding:24px;font-size:14px}.paper{max-width:760px;margin:auto}.brand{text-align:center;border-bottom:2px solid #174a7e;padding-bottom:14px;margin-bottom:16px}.brand h1{margin:0 0 8px;color:#0b2545;font-size:22px}.muted{color:#65758b;font-size:12px}.meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 0}.title{font-size:18px;font-weight:700;margin:18px 0 10px}table{width:100%;border-collapse:collapse;margin:14px 0}th,td{text-align:right;padding:9px 7px;border-bottom:1px solid #d9e1eb}th{background:#edf3f8;color:#0b2545}.totals{width:min(100%,360px);margin-inline-start:auto}.totals td{font-weight:700}.foot{border-top:1px solid #d9e1eb;text-align:center;padding-top:12px;margin-top:24px;color:#65758b;font-size:11px}@page{size:A4;margin:12mm}@media print{body{padding:0}.paper{max-width:none}}
+      </style></head><body><main class="paper"><header class="brand"><h1>${escapeHtml(store.name || 'مندوبي المبيعات')}</h1>${store.address ? `<div class="muted">${escapeHtml(store.address)}</div>` : ''}${store.phone ? `<div class="muted">${escapeHtml(store.phone)}</div>` : ''}</header>${content}<footer class="foot">سريع POS · تصميم وتطوير محمد عاطف · الدعم الفني +201142493701</footer></main></body></html>`);
+      printWindow.document.close();
+      setTimeout(() => { printWindow.focus(); printWindow.print(); }, 450);
+    }
+
+    function printInvoice(id) {
+      const invoice = state.invoices.find(item => item.id === id);
+      if (!invoice) return;
+      const rows = (invoice.items || []).map(item => `<tr><td>${escapeHtml(item.name)}</td><td>${safeNumber(item.qty)}</td><td>${formatMoney(item.unitPrice)}</td><td>${formatMoney(item.total)}</td></tr>`).join('');
+      const content = `<div class="title">فاتورة مبيعات</div><div class="meta"><span>رقم الفاتورة: ${escapeHtml(invoice.id)}</span><span>التاريخ: ${new Date(invoice.createdAt).toLocaleString('ar-EG')}</span></div><div class="meta"><span>العميل: ${escapeHtml(invoice.customerName)}</span><span>الهاتف: ${escapeHtml(invoice.customerPhone || 'غير مسجل')}</span></div><table><thead><tr><th>الصنف</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr></thead><tbody>${rows}</tbody></table><table class="totals"><tbody><tr><td>الإجمالي</td><td>${formatMoney(invoice.total)}</td></tr><tr><td>المدفوع</td><td>${formatMoney(invoice.paidCash)}</td></tr><tr><td>المتبقي</td><td>${formatMoney(invoice.balance)}</td></tr></tbody></table>${invoice.notes ? `<p>ملاحظات: ${escapeHtml(invoice.notes)}</p>` : ''}`;
+      openPrintDocument(`فاتورة ${invoice.id}`, content);
+    }
+
+    function printDayReport() {
+      const dayId = state.reportDayId || state.activeDayId;
+      const invoices = state.invoices.filter(invoice => invoice.dayId === dayId);
+      if (!invoices.length) { alert('لا توجد فواتير في اليومية المختارة.'); return; }
+      const rows = invoices.map(invoice => `<tr><td>${escapeHtml(invoice.customerName)}</td><td>${new Date(invoice.createdAt).toLocaleString('ar-EG')}</td><td>${invoice.balance > 0 ? 'آجل' : 'نقد'}</td><td>${formatMoney(invoice.total)}</td><td>${formatMoney(invoice.paidCash)}</td><td>${formatMoney(invoice.balance)}</td></tr>`).join('');
+      const total = invoices.reduce((sum, invoice) => sum + safeNumber(invoice.total), 0);
+      const cash = invoices.reduce((sum, invoice) => sum + safeNumber(invoice.paidCash), 0);
+      const credit = invoices.reduce((sum, invoice) => sum + safeNumber(invoice.balance), 0);
+      const content = `<div class="title">تقرير اليومية ${escapeHtml(dayId)}</div><div class="meta"><span>عدد الفواتير: ${invoices.length}</span><span>إجمالي المبيعات: ${formatMoney(total)}</span><span>النقدية: ${formatMoney(cash)}</span><span>الآجل: ${formatMoney(credit)}</span></div><table><thead><tr><th>العميل</th><th>التاريخ</th><th>التحصيل</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th></tr></thead><tbody>${rows}</tbody></table>`;
+      openPrintDocument(`تقرير ${dayId}`, content);
     }
 
     function parseDesktopBackupJson(rawText) {
       const data = JSON.parse(rawText);
       const products = Array.isArray(data.products) ? data.products : Array.isArray(data.Products) ? data.Products : [];
       const customers = Array.isArray(data.customers) ? data.customers : Array.isArray(data.Customers) ? data.Customers : [];
-      if (!products.length && !customers.length) {
-        throw new Error('ملف النسخة الاحتياطية لا يحتوي على منتجات أو عملاء.');
-      }
-
+      if (!products.length && !customers.length) { throw new Error('ملف النسخة الاحتياطية لا يحتوي على منتجات أو عملاء.'); }
       state.products = products.map(item => ({
         name: String(item.name || item.Name || item.ProductName || '').trim(),
         price: safeNumber(item.price ?? item.Price ?? item.UnitPrice ?? item.SellingPrice, 0),
@@ -1079,21 +696,9 @@
         barcode: String(item.barcode || item.Barcode || ''),
         category: String(item.category || item.Category || 'عام')
       })).filter(item => item.name);
-
-      state.customers = customers.map(item => ({
-        name: String(item.name || item.Name || '').trim(),
-        phone: String(item.phone || item.Phone || ''),
-        createdAt: Date.now()
-      })).filter(item => item.name);
-
-      saveProducts();
-      saveCustomers();
-      localStorage.setItem(MASTER_DATA_KEY, JSON.stringify({
-        importedAt: new Date().toISOString(),
-        products: state.products,
-        customers: state.customers
-      }));
-
+      state.customers = customers.map(item => ({ name: String(item.name || item.Name || '').trim(), phone: String(item.phone || item.Phone || ''), createdAt: Date.now() })).filter(item => item.name);
+      saveProducts(); saveCustomers();
+      localStorage.setItem(MASTER_DATA_KEY, JSON.stringify({ importedAt: new Date().toISOString(), products: state.products, customers: state.customers }));
       return { products: state.products.length, customers: state.customers.length };
     }
 
@@ -1107,40 +712,27 @@
       const file = event.target.files && event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          importBackupFromText(reader.result);
-        } catch (error) {
-          alert('تعذر قراءة ملف النسخة الاحتياطية: ' + (error.message || error));
-        } finally {
-          event.target.value = '';
-        }
-      };
+      reader.onload = () => { try { importBackupFromText(reader.result); } catch (error) { alert('تعذر قراءة ملف النسخة الاحتياطية: ' + (error.message || error)); } finally { event.target.value = ''; } };
       reader.readAsText(file, 'UTF-8');
     }
 
     function resetLocalData() {
-      const ok = confirm('هل تريد فعلاً تصفير كل البيانات المحلية؟ سيتم حذف الفواتير والمنتجات والعملاء المخزنة في الهاتف فقط.');
-      if (!ok) return;
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(CUSTOMERS_KEY);
-      localStorage.removeItem(PRODUCTS_KEY);
-      localStorage.removeItem(MASTER_DATA_KEY);
-      localStorage.removeItem(DAYS_KEY);
-      localStorage.removeItem(ACTIVE_DAY_KEY);
-      state.invoices = [];
-      state.customers = [];
-      state.products = [];
-      state.days = [];
-      state.activeDayId = localDayId();
-      state.reportDayId = state.activeDayId;
-      ensureActiveDay();
-      renderCustomerSuggestions();
-      renderProductSuggestions();
-      renderSummary();
-      renderInvoiceList();
-      resetForm();
-      alert('تم تصفير البيانات المحلية بنجاح.');
+      if (!confirm('هل تريد فعلاً تصفير كل البيانات المحلية؟ سيتم حذف الفواتير والمنتجات والعملاء المخزنة في الهاتف فقط.')) return;
+      localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(CUSTOMERS_KEY); localStorage.removeItem(PRODUCTS_KEY); localStorage.removeItem(MASTER_DATA_KEY); localStorage.removeItem(DAYS_KEY); localStorage.removeItem(ACTIVE_DAY_KEY);
+      state.invoices = []; state.customers = []; state.products = []; state.days = [];
+      state.activeDayId = localDayId(); state.reportDayId = state.activeDayId;
+      ensureActiveDay(); renderCustomerSuggestions(); renderProductSuggestions(); renderSummary(); renderInvoiceList(); resetForm(); alert('تم تصفير البيانات المحلية بنجاح.');
+    }
+
+    function activatePage(pageId) {
+      document.querySelectorAll('.tab-page').forEach(page => page.classList.toggle('active', page.id === pageId));
+      document.querySelectorAll('.nav-tab').forEach(button => {
+        const active = button.dataset.page === pageId;
+        button.classList.toggle('active', active);
+        if (active) button.setAttribute('aria-current', 'page');
+        else button.removeAttribute('aria-current');
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function startNewDay() {
@@ -1149,13 +741,9 @@
       if (currentDay) currentDay.closedAt = Date.now();
       const startedAt = Date.now();
       const newId = `${localDayId()}-${startedAt}`;
-      state.activeDayId = newId;
-      state.reportDayId = newId;
+      state.activeDayId = newId; state.reportDayId = newId;
       state.days.push({ id: newId, label: `يومية ${new Date(startedAt).toLocaleString('ar-EG')}`, startedAt });
-      saveDays();
-      renderSummary();
-      renderInvoiceList();
-      resetForm();
+      saveDays(); renderSummary(); renderInvoiceList(); resetForm();
     }
 
     document.getElementById('addItemBtn').addEventListener('click', () => addItemRow());
@@ -1167,29 +755,23 @@
     document.getElementById('importBackupBtn').addEventListener('click', () => document.getElementById('backupFileInput').click());
     document.getElementById('backupFileInput').addEventListener('change', handleBackupFiles);
     document.getElementById('resetAppBtn').addEventListener('click', resetLocalData);
+      document.getElementById('saveStoreSettingsBtn').addEventListener('click', saveStoreSettings);
+      document.getElementById('printDayBtn').addEventListener('click', printDayReport);
+      document.querySelectorAll('.nav-tab').forEach(button => button.addEventListener('click', () => activatePage(button.dataset.page)));
     document.getElementById('newDayBtn').addEventListener('click', startNewDay);
-    reportDaySelect.addEventListener('change', () => {
-      state.reportDayId = reportDaySelect.value;
-      renderInvoiceList();
-    });
+    reportDaySelect.addEventListener('change', () => { state.reportDayId = reportDaySelect.value; renderInvoiceList(); });
     paidCashInput.addEventListener('input', recalcTotals);
+      paymentModeInput.addEventListener('change', recalcTotals);
+    qrModal.addEventListener('click', (event) => { if (event.target === qrModal) closeQrModal(); });
 
-    qrModal.addEventListener('click', (event) => {
-      if (event.target === qrModal) closeQrModal();
-    });
+    resetForm(); ensureActiveDay(); renderCustomerSuggestions(); renderProductSuggestions(); renderSummary(); renderInvoiceList();
+  renderStoreSettings();
+  document.getElementById('footerYear').textContent = String(new Date().getFullYear());
 
-    resetForm();
-    ensureActiveDay();
-    renderCustomerSuggestions();
-    renderProductSuggestions();
-    renderSummary();
-    renderInvoiceList();
-
-    // تسجيل الـ Service Worker لتمكين العمل بدون إنترنت
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js')
-          .then(reg => console.log('Service Worker registered!', reg))
+          .then(reg => console.log('Service Worker registered!'))
           .catch(err => console.error('Service Worker registration failed:', err));
       });
     }

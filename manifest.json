@@ -2,7 +2,7 @@
   "name": "مندوبي المبيعات - Van Sales",
   "short_name": "Van Sales",
   "description": "تطبيق مندوبي المبيعات لإدارة الطلبات والعملاء",
-  "start_url": "./van-sales-mobile-app.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
