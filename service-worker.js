@@ -1,5 +1,5 @@
-const CACHE_NAME = 'van-sales-cache-v5';
-//  Version: v5 (Forced Update)
+const CACHE_NAME = 'van-sales-cache-v6';
+// Version: v6 (mobile catalog and invoice compatibility)
 // الملفات الأساسية التي يجب تخزينها للعمل دون اتصال
 const ASSETS_TO_CACHE = [
   './',

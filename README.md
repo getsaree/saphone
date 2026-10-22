@@ -10,10 +10,23 @@ A complete, local-only Point of Sale (POS) desktop application built with **.NET
 |---|---|
 | 🔐 **Login & Signup** | Username + password (SHA256 + per-user salt). Public signups are always Cashiers; Admins are created from the Users panel. |
 | 🧾 **Sales / Checkout** | Search products by name or barcode, add to cart, apply % discount, choose payment method (Cash / Card / Mobile), complete sale, print receipt. Cash payments validate that the amount received covers the total and show the correct change. |
-| 📦 **Inventory** | Full CRUD for products. Stock auto-decreases after every sale (atomic DB transaction). Rows highlight in **yellow** when `Stock <= MinStock`. |
+| ⚖️ **Weight-based products** | Mark a product as weight-based and enter its stock and prices per kilogram. Checkout adds half a kilogram at a time, displays the unit on the receipt, and keeps fractional stock, sale, return, quotation, and report quantities. |
+| 📦 **Inventory** | Full CRUD for products. Stock auto-decreases after every sale (atomic DB transaction). Rows highlight in **yellow** when `Stock <= MinStock`. CSV import/export includes the weight-based setting and decimal stock quantities. |
 | 💳 **Payments** | Three methods recorded per sale: Cash, Card, Mobile. |
-| 📊 **Reports** | Pick any date range. Shows: # of sales, revenue, cost of goods, **profit (Revenue − Cost)**, breakdown by payment method, and **top 5 best-selling products**. |
+| 📊 **Reports** | Date-range sales and profit summaries, payment-method totals, top products, period comparisons, profit by category, dormant stock, imported mobile-representative sales, customer/trader statements, and daily invoice/cash-movement reports. |
+| 🧾 **Invoice history** | Browse all sales invoices, open the full receipt and print it. |
+| 💰 **Cash register** | Track daily cash movements, deposits, returns, withdrawals, collections, and balance summaries. |
+| 👥 **Customers and traders** | Review customer balances and payments, and trader statements and purchase invoices. |
+| ⚙️ **Settings** | Configure store identity and appearance, automatic/manual database backups, and mobile catalog export. |
 | 👥 **Users (Admin only)** | Add/delete cashiers and admins. |
+
+### Reports, printing, and PDF
+
+Reports are arranged by purpose: **Cash drawer** (select a day to inspect invoices and incoming/outgoing cash, opening balance, and the amount remaining in the drawer), **Sales and profit** (date-range sales, costs, net profit, category profit, period comparisons, top products, and representative-phone invoices), **Capital and purchases** (purchase invoice totals, amounts paid on those invoices, and their remaining balances for a selected period), and **Other reports** (dormant/low-stock products and customer/trader accounts). Double-click a sales invoice to open and print its full receipt.
+
+Use each report's print action and choose **Microsoft Print to PDF** in the Windows print dialog to save a PDF. Cash drawer invoices and movements can be printed separately for an auditable daily report. Card and mobile payments are not counted as physical cash in the drawer; credit invoice payments are.
+
+The floating **Quick Assistant** runs locally against the on-device database and answers Arabic questions about the cash drawer, sales/profit, purchases, customers/traders, products, and invoice contents. It also provides period comparisons, category profit, dormant products, low-stock alerts, top sellers, mobile-representative invoices, and a daily detail report with invoice contents and cash movements. It handles common hamza/diacritic differences in names, supports date periods such as today, yesterday, this/last month, and the last N days, and can continue a report with short follow-ups such as "طيب امبارح؟". Results can be printed or saved using Microsoft Print to PDF.
 
 ### Roles
 - **Admin** sees: Checkout, Inventory, Reports, Users.
@@ -115,6 +128,26 @@ POSSystem/
 4. Go to **Inventory** → notice the stock for that product decreased.
 5. Go to **Reports** → click **Today** → see the sale you just made, with revenue + profit.
 6. Logout → login as `cashier1` / `cashier123` → confirm only Checkout is visible.
+7. In **Inventory**, add a product with **Weight-based** enabled, set its price per kilogram and stock in kilograms, then add it in **Checkout**. Start with 0.5 kg and use **+** once for 1 kg; confirm the receipt and remaining stock show the correct weight.
+
+## 📱 Mobile sales companion
+
+The mobile sales companion is the installable PWA served from the repository root (`index.html`). It works offline and stores its catalog, invoices, customers, and daily reports locally on the phone.
+
+### Transfer the desktop catalog to a phone
+
+1. In the desktop app, open **Settings** and export the mobile catalog JSON.
+2. On the phone, open the PWA, go to **Settings**, choose **Import desktop data / restore phone**, and select that JSON file.
+3. The catalog transfer includes product IDs, barcodes, prices, stock, and the **Weight-based** flag. Re-export the catalog after enabling weight sales or changing stock so the phone has the latest data.
+4. In a mobile invoice, choose a weight-based product to enter quantities in 0.5 kg increments. Saving checks and deducts the phone's local stock; editing and deleting invoices recalculate it.
+
+### Transfer mobile invoices to the desktop
+
+1. On the phone, select the relevant day in **Reports**, return to **Sales**, and choose **Generate system transfer code**; alternatively, download the JSON transfer file from that transfer screen.
+2. On the desktop, open the mobile representative-sales import screen and scan the QR or load the JSON.
+3. Imported invoice items are matched by product ID, barcode, or name. Weight quantities remain decimal and are validated against the desktop product and stock.
+
+Transfers are manual; the desktop and phone do **not** synchronize live, even when both are online. Use **Save phone backup** and restore it from the same Settings screen to preserve or move the phone's local data. Restoring a phone backup replaces the phone's current catalog, customers, invoices, and days.
 
 ---
 

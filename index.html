@@ -103,6 +103,13 @@
     .install-copy { color: var(--muted); line-height: 1.8; margin: 8px 0 16px; }
     .sale-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
     .item-grid .autocomplete-option { min-height: 46px; }
+    .quantity-control { display: grid; gap: 6px; }
+    .quantity-shortcuts { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+    .quantity-shortcuts.visible { display: grid; }
+    .quantity-shortcuts button { min-height: 34px; padding: 5px 8px; font-size: .72rem; }
+    .sync-status { display: inline-flex; align-items: center; gap: 6px; }
+    .sync-status::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #86efac; }
+    .sync-status.offline::before { background: #fbbf24; }
     @media (max-width: 420px) { .row2 { grid-template-columns: 1fr; } .item-grid { grid-template-columns: 1fr 1fr; } .item-grid > *:last-child { grid-column: 1 / -1; } .summary { grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
@@ -113,7 +120,7 @@
         <img class="brand-logo" src="./icon-192.png" alt="شعار التطبيق" onerror="this.style.display='none'" />
         <div>
           <h1>مندوبي المبيعات</h1>
-          <small>تتبع المبيعات دون إنترنت</small>
+          <small id="connectionStatus" class="sync-status">تتبع المبيعات دون إنترنت</small>
           <span id="storeNameCaption" class="store-caption"></span>
         </div>
       </div>
@@ -203,8 +210,7 @@
       </div>
     </section>
 
-    <section class="section">
-    </main>
+  </main>
     <section id="settingsPage" class="section tab-page">
       <div class="section-title">
         <span>الإعدادات</span>
@@ -222,6 +228,23 @@
           <label for="storePhoneInput">رقم هاتف المتجر</label>
           <input id="storePhoneInput" type="tel" maxlength="30" placeholder="رقم التواصل" />
         </div>
+        <div class="sale-options">
+          <div>
+            <label for="defaultSaleTypeInput">نوع البيع الافتراضي</label>
+            <select id="defaultSaleTypeInput" class="payment-select">
+              <option value="retail">تجزئة</option>
+              <option value="wholesale">جملة</option>
+            </select>
+          </div>
+          <div>
+            <label for="defaultPaymentModeInput">التحصيل الافتراضي</label>
+            <select id="defaultPaymentModeInput" class="payment-select">
+              <option value="credit">آجل</option>
+              <option value="cash">نقدي بالكامل</option>
+              <option value="partial">دفع جزئي</option>
+            </select>
+          </div>
+        </div>
         <button type="button" class="primary" id="saveStoreSettingsBtn">حفظ بيانات المتجر</button>
         <div id="settingsStatus" class="muted" role="status" aria-live="polite"></div>
       </div>
@@ -233,15 +256,15 @@
         <p>موقع البرنامج: <a href="https://getsaree.github.io/saree/" target="_blank" rel="noopener">getsaree.github.io/saree</a></p>
       </div>
       <div class="button-row">
-        <button type="button" class="secondary" id="importBackupBtn">استيراد نسخة الديسكتوب</button>
+        <button type="button" class="secondary" id="importBackupBtn">استيراد بيانات الديسكتوب / استعادة الهاتف</button>
+        <button type="button" class="secondary" id="exportPhoneBackupBtn">حفظ نسخة الهاتف</button>
         <button type="button" class="warn" id="newDayBtn">بدء يوم جديد</button>
         <button type="button" class="danger" id="resetAppBtn">تصفير البيانات المحلية</button>
       </div>
       <input id="backupFileInput" type="file" accept="application/json,.json" style="display:none;" />
-      <div class="muted" style="margin-top:10px; font-size:0.78rem;">يتم استيراد جميع المنتجات والعملاء من النسخة الاحتياطية، ثم تُحفظ محلياً للاستعمال خارج الشبكة.</div>
+      <div class="muted" style="margin-top:10px; font-size:0.78rem;">استورد ملف المنتجات والعملاء من إعدادات الحاسوب. لترحيل المبيعات، حمّل ملف JSON أو امسح QR من شاشة استيراد مبيعات المندوب على الحاسوب. يعمل التطبيق دون اتصال؛ لا توجد مزامنة لحظية.</div>
     </section>
 
-    <section class="section">
     <section id="reportsPage" class="section tab-page">
       <div class="section-title">
         <span>التقارير اليومية</span>
@@ -363,6 +386,8 @@
           document.getElementById('storeNameInput').value = state.storeSettings.name || '';
           document.getElementById('storeAddressInput').value = state.storeSettings.address || '';
           document.getElementById('storePhoneInput').value = state.storeSettings.phone || '';
+          document.getElementById('defaultSaleTypeInput').value = state.storeSettings.defaultSaleType || 'retail';
+          document.getElementById('defaultPaymentModeInput').value = state.storeSettings.defaultPaymentMode || 'credit';
           document.getElementById('storeNameCaption').textContent = state.storeSettings.name || '';
         }
 
@@ -370,7 +395,9 @@
           state.storeSettings = {
             name: document.getElementById('storeNameInput').value.trim(),
             address: document.getElementById('storeAddressInput').value.trim(),
-            phone: document.getElementById('storePhoneInput').value.trim()
+            phone: document.getElementById('storePhoneInput').value.trim(),
+            defaultSaleType: document.getElementById('defaultSaleTypeInput').value,
+            defaultPaymentMode: document.getElementById('defaultPaymentModeInput').value
           };
           localStorage.setItem(STORE_SETTINGS_KEY, JSON.stringify(state.storeSettings));
           renderStoreSettings();
@@ -402,7 +429,14 @@
 
     function customerRecords() { return [...new Map(state.customers.filter(customer => customer.name).map(customer => [customer.name.trim().toLowerCase(), customer])).values()]; }
     function customerLabel(customer) { return { title: customer.name, detail: customer.phone || 'عميل مسجل' }; }
-    function productLabel(product) { return { title: product.name, detail: `${product.barcode ? `باركود: ${product.barcode} · ` : ''}تجزئة ${formatMoney(product.price || product.unitPrice || 0)} · جملة ${formatMoney(product.wholesalePrice || product.price || product.unitPrice || 0)}` }; }
+    function productLabel(product) {
+      const unit = product.isWeightBased ? ' /كجم' : '';
+      const stock = product.stock == null ? '' : ` · مخزون ${Number(product.stock).toFixed(2)}${product.isWeightBased ? ' كجم' : ''}`;
+      return {
+        title: product.name,
+        detail: `${product.barcode ? `باركود: ${product.barcode} · ` : ''}تجزئة ${formatMoney(product.price || product.unitPrice || 0)}${unit} · جملة ${formatMoney(product.wholesalePrice || product.price || product.unitPrice || 0)}${unit}${stock}`
+      };
+    }
     function renderPickerOptions(input, panel, records, describe, onSelect) {
       const query = input.value.trim().toLocaleLowerCase('ar');
       const matches = records.filter(record => {
@@ -444,7 +478,22 @@
       const wholesalePrice = safeNumber(product.wholesalePrice, 0);
       return saleTypeInput.value === 'wholesale' && wholesalePrice > 0 ? wholesalePrice : retailPrice;
     }
-    function selectProduct(input, product) { input.value = product.name; input.closest('.item-row').querySelector('.item-price').value = selectedProductPrice(product); input.dispatchEvent(new Event('change', { bubbles: true })); }
+    function selectProduct(input, product) {
+      input.value = product.name;
+      const row = input.closest('.item-row');
+      const priceInput = row.querySelector('.item-price');
+      const quantityInput = row.querySelector('.item-qty');
+      priceInput.value = selectedProductPrice(product);
+      quantityInput.step = product.isWeightBased ? '0.5' : '1';
+      quantityInput.min = product.isWeightBased ? '0.5' : '1';
+      row.querySelector('.quantity-label').textContent = product.isWeightBased ? 'الكمية (كجم)' : 'الكمية';
+      row.querySelector('.quantity-shortcuts').classList.toggle('visible', Boolean(product.isWeightBased));
+      if (product.isWeightBased && safeNumber(quantityInput.value, 1) === 1 && !row.dataset.quantityEdited)
+        quantityInput.value = '0.5';
+      if (!product.isWeightBased && !Number.isInteger(safeNumber(quantityInput.value, 1)))
+        quantityInput.value = '1';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
 
     function renderDayOptions() {
       const dayIds = new Set(state.days.map(day => day.id));
@@ -461,7 +510,7 @@
 
     function findProductByName(name) {
       const normalized = (name || '').trim().toLowerCase();
-      return state.products.find(product => (product.name || '').trim().toLowerCase() === normalized || (product.barcode || '').trim().toLowerCase() === normalized ) || null;
+      return state.products.find(product => (product.name || '').trim().toLowerCase() === normalized || (product.barcode || '').trim().toLowerCase() === normalized) || null;
     }
 
     function applyProductPriceIfMatched(nameInput, priceInput) {
@@ -469,11 +518,25 @@
       if (!product) return;
       nameInput.value = product.name;
       if (safeNumber(priceInput.value, 0) === 0 || safeNumber(priceInput.value, 0) <= 0.01) { priceInput.value = selectedProductPrice(product); }
+      const row = nameInput.closest('.item-row');
+      const quantityInput = row.querySelector('.item-qty');
+      quantityInput.step = product.isWeightBased ? '0.5' : '1';
+      quantityInput.min = product.isWeightBased ? '0.5' : '1';
+      row.querySelector('.quantity-label').textContent = product.isWeightBased ? 'الكمية (كجم)' : 'الكمية';
+      row.querySelector('.quantity-shortcuts').classList.toggle('visible', Boolean(product.isWeightBased));
+      if (product.isWeightBased && safeNumber(quantityInput.value, 1) === 1 && !row.dataset.quantityEdited)
+        quantityInput.value = '0.5';
+      if (!product.isWeightBased && !Number.isInteger(safeNumber(quantityInput.value, 1)))
+        quantityInput.value = '1';
     }
 
     function createItemRow(item = { name: '', qty: 1, unitPrice: 0 }) {
       const row = document.createElement('div');
       row.className = 'item-row';
+      const selectedProduct = findProductByName(item.name);
+      const isWeightBased = Boolean(item.isWeightBased || selectedProduct?.isWeightBased);
+      const initialQuantity = safeNumber(item.qty, isWeightBased ? 0.5 : 1);
+      if (item.name && item.qty != null) row.dataset.quantityEdited = 'true';
       row.innerHTML = `
         <div class="item-head">
           <strong>الصنف</strong>
@@ -481,9 +544,17 @@
         </div>
         <div class="item-grid">
           <div><label>اسم الصنف</label><div class="autocomplete"><input class="item-name" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" placeholder="ابحث عن منتج" value="${escapeHtml(item.name)}" /><div class="autocomplete-options" role="listbox" hidden></div></div></div>
-          <div><label>الكمية</label><input class="item-qty" type="number" min="1" step="1" value="${safeNumber(item.qty, 1)}" /></div>
+          <div><label class="quantity-label">${isWeightBased ? 'الكمية (كجم)' : 'الكمية'}</label>
+            <div class="quantity-control">
+              <input class="item-qty" type="number" min="${isWeightBased ? '0.5' : '1'}" step="${isWeightBased ? '0.5' : '1'}" inputmode="decimal" value="${initialQuantity}" />
+              <div class="quantity-shortcuts${isWeightBased ? ' visible' : ''}">
+                <button class="secondary half-kilo-btn" type="button">نصف كجم</button>
+                <button class="secondary one-kilo-btn" type="button">1 كجم</button>
+              </div>
+            </div>
+          </div>
           <div><label>سعر الوحدة</label><input class="item-price" type="number" min="0" step="0.01" value="${safeNumber(item.unitPrice, 0)}" /></div>
-          <div><label>الإجمالي</label><input class="item-total" type="text" value="${formatMoney((safeNumber(item.qty, 1) * safeNumber(item.unitPrice, 0)))}" readonly /></div>
+          <div><label>الإجمالي</label><input class="item-total" type="text" value="${formatMoney((initialQuantity * safeNumber(item.unitPrice, 0)))}" readonly /></div>
         </div>
       `;
 
@@ -502,11 +573,13 @@
         recalcTotals();
       };
 
-      qtyInput.addEventListener('input', recalc);
+      qtyInput.addEventListener('input', () => { row.dataset.quantityEdited = 'true'; recalc(); });
       priceInput.addEventListener('input', recalc);
       nameInput.addEventListener('change', () => { applyProductPriceIfMatched(nameInput, priceInput); recalc(); });
       nameInput.addEventListener('blur', () => { applyProductPriceIfMatched(nameInput, priceInput); recalc(); });
       nameInput.addEventListener('input', recalc);
+      row.querySelector('.half-kilo-btn').addEventListener('click', () => { qtyInput.value = '0.5'; row.dataset.quantityEdited = 'true'; recalc(); });
+      row.querySelector('.one-kilo-btn').addEventListener('click', () => { qtyInput.value = '1'; row.dataset.quantityEdited = 'true'; recalc(); });
       attachPicker(nameInput, optionsPanel, () => state.products, productLabel, product => selectProduct(nameInput, product));
       removeBtn.addEventListener('click', () => { row.remove(); recalcTotals(); });
       recalc(); return row;
@@ -520,7 +593,18 @@
         const itemName = row.querySelector('.item-name').value.trim();
         const qty = safeNumber(row.querySelector('.item-qty').value, 0);
         const unitPrice = safeNumber(row.querySelector('.item-price').value, 0);
-        if (itemName || qty > 0 || unitPrice > 0) { items.push({ name: itemName, qty, unitPrice, total: qty * unitPrice }); }
+        if (itemName || unitPrice > 0 || (qty > 0 && qty !== 1)) {
+          const product = findProductByName(itemName);
+          items.push({
+            productId: product?.id ?? null,
+            barcode: product?.barcode || '',
+            name: product?.name || itemName,
+            qty,
+            unitPrice,
+            total: qty * unitPrice,
+            isWeightBased: Boolean(product?.isWeightBased)
+          });
+        }
       });
       return items;
     }
@@ -597,7 +681,63 @@
       document.getElementById('selectedDaySummary').textContent = `الفواتير: ${invoices.length} · المبيعات: ${formatMoney(total)} · النقدية: ${formatMoney(cash)} · الآجل: ${formatMoney(credit)}`;
     }
 
-    function deleteInvoice(id) { state.invoices = state.invoices.filter(inv => inv.id !== id); saveInvoices(); }
+    function findProductForInvoiceItem(item) {
+      return state.products.find(product =>
+        (item.productId != null && String(product.id) === String(item.productId)) ||
+        (item.barcode && product.barcode && String(product.barcode) === String(item.barcode)) ||
+        (item.name && product.name.trim().toLocaleLowerCase('ar') === item.name.trim().toLocaleLowerCase('ar'))) || null;
+    }
+
+    function planInventoryUpdate(itemsToRestore, itemsToDeduct) {
+      const projectedStock = new Map();
+      state.products.forEach(product => {
+        if (product.stock != null && Number.isFinite(Number(product.stock)))
+          projectedStock.set(product, Number(product.stock));
+      });
+
+      (itemsToRestore || []).forEach(item => {
+        const product = findProductForInvoiceItem(item);
+        if (product && projectedStock.has(product))
+          projectedStock.set(product, projectedStock.get(product) + safeNumber(item.qty));
+      });
+
+      for (const item of itemsToDeduct || []) {
+        const product = findProductForInvoiceItem(item);
+        const isWeightBased = Boolean(product?.isWeightBased || item.isWeightBased);
+        const quantity = Number(item.qty);
+        if (!Number.isFinite(quantity) || quantity <= 0)
+          throw new Error(`أدخل كمية صحيحة للمنتج «${item.name}».`);
+        if (isWeightBased ? Math.round(quantity * 2) !== quantity * 2 : !Number.isInteger(quantity))
+          throw new Error(isWeightBased
+            ? `كمية «${item.name}» يجب أن تكون نصف كجم أو مضاعفاته.`
+            : `كمية «${item.name}» يجب أن تكون عدداً صحيحاً.`);
+        if (product && projectedStock.has(product)) {
+          const available = projectedStock.get(product);
+          if (quantity > available)
+            throw new Error(`الكمية المطلوبة من «${product.name}» أكبر من المخزون المتاح (${available.toFixed(2)}${product.isWeightBased ? ' كجم' : ' وحدة'}).`);
+          projectedStock.set(product, available - quantity);
+        }
+      }
+      return projectedStock;
+    }
+
+    function applyInventoryUpdate(projectedStock) {
+      projectedStock.forEach((stock, product) => { product.stock = stock; });
+      saveProducts();
+    }
+
+    function deleteInvoice(id) {
+      const invoice = state.invoices.find(item => item.id === id);
+      if (!invoice) return;
+      try {
+        const projectedStock = planInventoryUpdate(invoice.items, []);
+        applyInventoryUpdate(projectedStock);
+        state.invoices = state.invoices.filter(inv => inv.id !== id);
+        saveInvoices();
+      } catch (error) {
+        alert('تعذر حذف الفاتورة: ' + (error.message || error));
+      }
+    }
 
     function editInvoice(id) {
       const inv = state.invoices.find(item => item.id === id);
@@ -612,6 +752,14 @@
 
     function prepareInvoiceFromForm() {
       const items = readItems();
+      for (const item of items) {
+        const product = findProductByName(item.name);
+        item.isWeightBased = Boolean(product?.isWeightBased);
+        item.productId = product?.id ?? null;
+        item.barcode = product?.barcode || '';
+        if (!item.name) { alert('يرجى اختيار منتج لكل صنف.'); return null; }
+        if (!Number.isFinite(item.unitPrice) || item.unitPrice < 0) { alert(`سعر «${item.name}» غير صحيح.`); return null; }
+      }
       const subtotal = items.reduce((sum, item) => sum + (safeNumber(item.qty, 0) * safeNumber(item.unitPrice, 0)), 0);
       const enteredPayment = Math.max(0, safeNumber(paidCashInput.value.replace(/[,٬\s]/g, ''), 0));
       const paidCash = paymentModeInput.value === 'cash' ? subtotal : paymentModeInput.value === 'credit' ? 0 : Math.min(subtotal, enteredPayment);
@@ -631,22 +779,34 @@
         dayId: existingInvoice?.dayId || state.activeDayId
       };
 
-      if (!state.customers.some(c => c.name.toLowerCase() === customerName.toLowerCase())) {
-        state.customers.push({ name: customerName, phone: customerPhone, createdAt: Date.now() }); saveCustomers();
-      }
       return invoice;
     }
 
     function saveInvoice() {
       const invoice = prepareInvoiceFromForm();
       if (!invoice) return;
+      const previousInvoice = state.invoices.find(inv => inv.id === invoice.id);
+      let projectedStock;
+      try {
+        projectedStock = planInventoryUpdate(previousInvoice?.items || [], invoice.items);
+      } catch (error) {
+        alert('تعذر حفظ الفاتورة: ' + (error.message || error));
+        return;
+      }
+      if (!state.customers.some(customer => customer.name.toLowerCase() === invoice.customerName.toLowerCase())) {
+        state.customers.push({ name: invoice.customerName, phone: invoice.customerPhone, createdAt: Date.now() });
+        saveCustomers();
+      }
+      applyInventoryUpdate(projectedStock);
       const targetIndex = state.invoices.findIndex(inv => inv.id === invoice.id);
       if (targetIndex >= 0) { state.invoices[targetIndex] = invoice; } else { state.invoices.push(invoice); }
       saveInvoices(); resetForm(); alert('تم حفظ الفاتورة محلياً بنجاح.');
     }
 
     function resetForm() {
-      customerNameInput.value = ''; phoneInput.value = ''; notesInput.value = ''; paidCashInput.value = 0; paymentModeInput.value = 'credit';
+      customerNameInput.value = ''; phoneInput.value = ''; notesInput.value = ''; paidCashInput.value = 0;
+      paymentModeInput.value = state.storeSettings.defaultPaymentMode || 'credit';
+      saleTypeInput.value = state.storeSettings.defaultSaleType || 'retail';
       itemsContainer.innerHTML = ''; addItemRow(); state.selectedInvoiceId = null; recalcTotals();
     }
 
@@ -658,8 +818,8 @@
       const selectedDayId = state.reportDayId || state.activeDayId;
       const todayInvoices = state.invoices.filter(inv => inv.dayId === selectedDayId && !inv.exportedAt);
       const payload = {
-        version: 1, app: 'van-sales-mobile', deviceId: 'sales-phone-' + Math.random().toString(16).slice(2, 8),
-        generatedAt: new Date().toISOString(), merchant: 'Main Store',
+        version: 2, app: 'van-sales-mobile', deviceId: 'sales-phone-' + Math.random().toString(16).slice(2, 8),
+        generatedAt: new Date().toISOString(), merchant: state.storeSettings.name || 'Main Store',
         invoices: todayInvoices.map(inv => ({
           id: inv.id, customerName: inv.customerName, customerPhone: inv.customerPhone || '', notes: inv.notes || '', saleType: inv.saleType || 'retail',
           items: inv.items, total: Number(inv.total || 0), paidCash: Number(inv.paidCash || 0), balance: Number(inv.balance || 0),
@@ -755,8 +915,8 @@
     function printInvoice(id) {
       const invoice = state.invoices.find(item => item.id === id);
       if (!invoice) return;
-      const rows = (invoice.items || []).map(item => `<tr><td>${escapeHtml(item.name)}</td><td>${safeNumber(item.qty)}</td><td>${formatMoney(item.unitPrice)}</td><td>${formatMoney(item.total)}</td></tr>`).join('');
-      const content = `<div class="title">فاتورة مبيعات - ${invoice.saleType === 'wholesale' ? 'جملة' : 'تجزئة'}</div><div class="meta"><span>رقم الفاتورة: ${escapeHtml(invoice.id)}</span><span>التاريخ: ${new Date(invoice.createdAt).toLocaleString('ar-EG')}</span></div><div class="meta"><span>العميل: ${escapeHtml(invoice.customerName)}</span><span>الهاتف: ${escapeHtml(invoice.customerPhone || 'غير مسجل')}</span></div><table><thead><tr><th>الصنف</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr></thead><tbody>${rows}</tbody></table><table class="totals"><tbody><tr><td>الإجمالي</td><td>${formatMoney(invoice.total)}</td></tr><tr><td>المدفوع</td><td>${formatMoney(invoice.paidCash)}</td></tr><tr><td>المتبقي</td><td>${formatMoney(invoice.balance)}</td></tr></tbody></table>${invoice.notes ? `<p>ملاحظات: ${escapeHtml(invoice.notes)}</p>` : ''}`;
+      const rows = (invoice.items || []).map(item => `<tr><td>${escapeHtml(item.name)}</td><td>${safeNumber(item.qty)}${item.isWeightBased ? ' كجم' : ''}</td><td>${formatMoney(item.unitPrice)}${item.isWeightBased ? ' /كجم' : ''}</td><td>${formatMoney(item.total)}</td></tr>`).join('');
+      const content = `<div class="title">فاتورة مبيعات - ${invoice.saleType === 'wholesale' ? 'جملة' : 'تجزئة'}</div><div class="meta"><span>رقم الفاتورة: ${escapeHtml(invoice.id)}</span><span>التاريخ: ${new Date(invoice.createdAt).toLocaleString('ar-EG')}</span></div><div class="meta"><span>العميل: ${escapeHtml(invoice.customerName)}</span><span>الهاتف: ${escapeHtml(invoice.customerPhone || 'غير مسجل')}</span></div><table><thead><tr><th>الصنف</th><th>الكمية</th><th>سعر الكجم / الوحدة</th><th>الإجمالي</th></tr></thead><tbody>${rows}</tbody></table><table class="totals"><tbody><tr><td>الإجمالي</td><td>${formatMoney(invoice.total)}</td></tr><tr><td>المدفوع</td><td>${formatMoney(invoice.paidCash)}</td></tr><tr><td>المتبقي</td><td>${formatMoney(invoice.balance)}</td></tr></tbody></table>${invoice.notes ? `<p>ملاحظات: ${escapeHtml(invoice.notes)}</p>` : ''}`;
       openPrintDocument(`فاتورة ${invoice.id}`, content);
     }
 
@@ -777,24 +937,100 @@
       const products = Array.isArray(data.products) ? data.products : Array.isArray(data.Products) ? data.Products : [];
       const customers = Array.isArray(data.customers) ? data.customers : Array.isArray(data.Customers) ? data.Customers : [];
       if (!products.length && !customers.length) { throw new Error('ملف النسخة الاحتياطية لا يحتوي على منتجات أو عملاء.'); }
-      state.products = products.map(item => ({
-        name: String(item.name || item.Name || item.ProductName || '').trim(),
-        price: safeNumber(item.price ?? item.Price ?? item.UnitPrice ?? item.SellingPrice, 0),
-        unitPrice: safeNumber(item.price ?? item.Price ?? item.UnitPrice ?? item.SellingPrice, 0),
-        wholesalePrice: safeNumber(item.wholesalePrice ?? item.WholesalePrice, 0),
-        barcode: String(item.barcode || item.Barcode || ''),
-        category: String(item.category || item.Category || 'عام')
+      const normalizedProducts = products.map(item => {
+        const name = String(item.name || item.Name || item.ProductName || '').trim();
+        const stockValue = item.stock ?? item.Stock;
+        const stock = stockValue == null ? null : Number(stockValue);
+        const price = Number(item.price ?? item.Price ?? item.UnitPrice ?? item.SellingPrice ?? 0);
+        const wholesalePrice = Number(item.wholesalePrice ?? item.WholesalePrice ?? 0);
+        const weightedValue = item.isWeightBased ?? item.IsWeightBased ?? item.isWeighted ?? item.IsWeighted ?? false;
+        const isWeightBased = weightedValue === true || weightedValue === 1 || weightedValue === '1' || String(weightedValue).toLowerCase() === 'true';
+        if (!name) return null;
+        if (!Number.isFinite(price) || price < 0 || !Number.isFinite(wholesalePrice) || wholesalePrice < 0)
+          throw new Error(`سعر المنتج «${name}» غير صحيح في ملف الاستيراد.`);
+        if (stock !== null && (!Number.isFinite(stock) || stock < 0))
+          throw new Error(`مخزون المنتج «${name}» غير صحيح في ملف الاستيراد.`);
+        return {
+          id: item.id ?? item.Id ?? null,
+          name,
+          price,
+          unitPrice: price,
+          wholesalePrice,
+          barcode: String(item.barcode || item.Barcode || ''),
+          category: String(item.category || item.Category || 'عام'),
+          stock,
+          isWeightBased
+        };
+      }).filter(Boolean);
+      const normalizedCustomers = customers.map(item => ({
+        id: item.id ?? item.Id ?? null,
+        name: String(item.name || item.Name || '').trim(),
+        phone: String(item.phone || item.Phone || ''),
+        address: String(item.address || item.Address || ''),
+        createdAt: Date.now()
       })).filter(item => item.name);
-      state.customers = customers.map(item => ({ name: String(item.name || item.Name || '').trim(), phone: String(item.phone || item.Phone || ''), createdAt: Date.now() })).filter(item => item.name);
+      state.products = normalizedProducts;
+      state.customers = normalizedCustomers;
       saveProducts(); saveCustomers();
       localStorage.setItem(MASTER_DATA_KEY, JSON.stringify({ importedAt: new Date().toISOString(), products: state.products, customers: state.customers }));
       return { products: state.products.length, customers: state.customers.length };
     }
 
+    function restorePhoneBackup(data) {
+      if (!Array.isArray(data.products) || !Array.isArray(data.customers) ||
+          !Array.isArray(data.invoices) || !Array.isArray(data.days))
+        throw new Error('ملف النسخة الاحتياطية للهاتف غير مكتمل.');
+      if (!confirm('استعادة نسخة الهاتف ستستبدل فواتير ومنتجات وعملاء وبيانات هذا الجهاز. هل تريد المتابعة؟'))
+        return false;
+      state.products = data.products;
+      state.customers = data.customers;
+      state.invoices = data.invoices;
+      state.days = data.days;
+      state.activeDayId = data.activeDayId || localDayId();
+      state.reportDayId = state.activeDayId;
+      state.storeSettings = data.storeSettings || {};
+      saveProducts();
+      saveCustomers();
+      saveDays();
+      localStorage.setItem(STORE_SETTINGS_KEY, JSON.stringify(state.storeSettings));
+      saveInvoices();
+      renderStoreSettings();
+      resetForm();
+      return true;
+    }
+
     function importBackupFromText(text) {
+      const data = JSON.parse(text);
+      if (data.format === 'van-sales-mobile-backup' && data.version === 1) {
+        if (restorePhoneBackup(data)) alert('تمت استعادة نسخة الهاتف بالكامل.');
+        return;
+      }
       const parsed = parseDesktopBackupJson(text);
       alert(`تم استيراد ${parsed.products} منتج و ${parsed.customers} عميل من النسخة الاحتياطية.`);
       resetForm();
+    }
+
+    function exportPhoneBackup() {
+      const backup = {
+        format: 'van-sales-mobile-backup',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        products: state.products,
+        customers: state.customers,
+        invoices: state.invoices,
+        days: state.days,
+        activeDayId: state.activeDayId,
+        storeSettings: state.storeSettings
+      };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `van-sales-backup-${localDayId()}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
     function handleBackupFiles(event) {
@@ -843,11 +1079,22 @@
     document.getElementById('downloadPayloadBtn').addEventListener('click', downloadPayload);
     document.getElementById('importBackupBtn').addEventListener('click', () => document.getElementById('backupFileInput').click());
     document.getElementById('backupFileInput').addEventListener('change', handleBackupFiles);
+    document.getElementById('exportPhoneBackupBtn').addEventListener('click', exportPhoneBackup);
     document.getElementById('resetAppBtn').addEventListener('click', resetLocalData);
       document.getElementById('saveStoreSettingsBtn').addEventListener('click', saveStoreSettings);
       document.getElementById('printDayBtn').addEventListener('click', printDayReport);
       document.querySelectorAll('.nav-tab').forEach(button => button.addEventListener('click', () => activatePage(button.dataset.page)));
     document.getElementById('newDayBtn').addEventListener('click', startNewDay);
+    const connectionStatus = document.getElementById('connectionStatus');
+    const updateConnectionStatus = () => {
+      const online = navigator.onLine;
+      connectionStatus.textContent = online ? 'إنترنت متصل · البيانات محلية' : 'دون إنترنت · البيانات محلية';
+      connectionStatus.classList.toggle('offline', !online);
+      connectionStatus.title = 'الاتصال لا يفعّل المزامنة الفورية؛ استخدم ملفات الاستيراد والتصدير.';
+    };
+    window.addEventListener('online', updateConnectionStatus);
+    window.addEventListener('offline', updateConnectionStatus);
+    updateConnectionStatus();
     attachPicker(customerNameInput, customerOptions, customerRecords, customerLabel, selectCustomer);
     reportDaySelect.addEventListener('change', () => { state.reportDayId = reportDaySelect.value; renderInvoiceList(); });
     paidCashInput.addEventListener('input', recalcTotals);
